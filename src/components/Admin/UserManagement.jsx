@@ -113,7 +113,7 @@ const UserManagement = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
                     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">User Management</h2>
-                    <p className="text-slate-600 font-medium text-sm sm:text-base mt-0.5">Manage admin and engineer accounts</p>
+                    <p className="text-slate-600 font-medium text-sm sm:text-base mt-0.5">Manage admin and field survey person accounts</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
@@ -140,7 +140,7 @@ const UserManagement = () => {
                     <p className="text-xl sm:text-2xl font-bold text-slate-900">{users.filter(u => u.role === 'admin').length}</p>
                 </div>
                 <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm">
-                    <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Engineers</p>
+                    <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Field Surveyors</p>
                     <p className="text-xl sm:text-2xl font-bold text-slate-900">{users.filter(u => u.role === 'engineer').length}</p>
                 </div>
             </div>
@@ -369,7 +369,7 @@ const UserManagement = () => {
                                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                                     className="w-full pl-9 pr-3 py-2 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-indigo-500/20 appearance-none"
                                                 >
-                                                    <option value="engineer">Field Engineer</option>
+                                                    <option value="engineer">Field Survey Person</option>
                                                     <option value="admin">Administrator</option>
                                                 </select>
                                             </div>

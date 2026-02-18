@@ -4,8 +4,8 @@ import { supabase } from '../supabase';
  * Authentication & User Management Service
  */
 
-// Get all engineers for assignment dropdown
-export const getAllEngineers = async () => {
+// Get all field survey persons for assignment dropdown
+export const getAllFieldSurveyors = async () => {
     try {
         const { data, error } = await supabase
             .from('users')
@@ -17,13 +17,13 @@ export const getAllEngineers = async () => {
         if (error) throw error;
         return { success: true, data };
     } catch (error) {
-        console.error('[AuthService] Get Engineers Error:', error);
+        console.error('[AuthService] Get Field Surveyors Error:', error);
         return { success: false, error };
     }
 };
 
-// Assign engineer to a lead
-export const assignEngineerToLead = async (leadId, engineerId, assignedBy) => {
+// Assign field survey person to a lead
+export const assignSurveyorToLead = async (leadId, surveyorId, assignedBy) => {
     try {
         // First, mark all previous assignments as not current
         await supabase
@@ -36,7 +36,7 @@ export const assignEngineerToLead = async (leadId, engineerId, assignedBy) => {
             .from('lead_assignments')
             .insert([{
                 lead_id: leadId,
-                engineer_id: engineerId,
+                engineer_id: surveyorId,
                 is_current: true,
                 created_by: assignedBy
             }])
@@ -51,8 +51,8 @@ export const assignEngineerToLead = async (leadId, engineerId, assignedBy) => {
     }
 };
 
-// Get current engineer for a lead
-export const getCurrentEngineer = async (leadId) => {
+// Get current field survey person for a lead
+export const getCurrentSurveyor = async (leadId) => {
     try {
         const { data, error } = await supabase
             .from('lead_assignments')

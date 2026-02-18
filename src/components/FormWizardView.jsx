@@ -74,7 +74,7 @@ const FormWizardView = ({ user, onComplete, onCancel }) => {
     const validateStakeholderDetails = () => {
         const { architectName, architectContact, contractorName, contractorContact } = formData.stakeholders;
         const newErrors = {};
-        if (!architectName) newErrors.architectName = 'Architect/Engineer Name is required';
+        if (!architectName) newErrors.architectName = 'Architect/Design Professional Name is required';
         const architectContactError = validateMobile(architectContact);
         if (architectContactError) newErrors.architectContact = architectContactError;
         if (!contractorName) newErrors.contractorName = 'Contractor Name is required';
@@ -149,13 +149,13 @@ const FormWizardView = ({ user, onComplete, onCancel }) => {
     return (
         <div className="max-w-4xl mx-auto h-full flex flex-col">
             {/* Step Indicator - Fixed at top */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-6">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm mb-3 sm:mb-6">
                 <StepIndicator steps={STEPS} currentStep={currentStep} />
             </div>
 
             {/* Form Content - Scrollable */}
-            <div ref={mainContentRef} className="flex-1 overflow-y-auto mb-6">
-                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm min-h-[500px]">
+            <div ref={mainContentRef} className="flex-1 overflow-y-auto mb-4 sm:mb-6">
+                <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm min-h-[400px] sm:min-h-[500px]">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentStep}

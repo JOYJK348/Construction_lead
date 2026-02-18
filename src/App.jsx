@@ -11,7 +11,7 @@ import PaymentPriority from './components/FormSteps/PaymentPriority';
 import Summary from './components/FormSteps/Summary';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
-import EngineerDashboard from './components/EngineerDashboard';
+import FieldSurveyDashboard from './components/FieldSurveyDashboard';
 import { submitLead, approveLead, rejectLead } from './services/leadService';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -81,13 +81,13 @@ const LeadSuccessView = ({ user, setIsSubmitted, setCurrentStep, setFormData, na
             {/* Action Buttons */}
             <div className="space-y-3 sm:space-y-3.5">
                 <button
-                    onClick={() => { setIsSubmitted(false); setCurrentStep(0); setFormData(INITIAL_LEAD_DATA); navigate(user.role === 'admin' ? '/admin/new' : '/engineer/new'); }}
+                    onClick={() => { setIsSubmitted(false); setCurrentStep(0); setFormData(INITIAL_LEAD_DATA); navigate(user.role === 'admin' ? '/admin/new' : '/field-survey/new'); }}
                     className="w-full py-3.5 sm:py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base shadow-lg shadow-emerald-200 active:scale-[0.98] transition-all"
                 >
                     Collect Another Lead
                 </button>
                 <button
-                    onClick={() => { setIsSubmitted(false); navigate(user.role === 'admin' ? '/admin' : '/engineer'); }}
+                    onClick={() => { setIsSubmitted(false); navigate(user.role === 'admin' ? '/admin' : '/field-survey'); }}
                     className="w-full py-3.5 sm:py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base active:scale-[0.98] transition-all"
                 >
                     Back to Dashboard
@@ -101,89 +101,83 @@ const LeadDetailView = ({ viewModeLead, navigate, user, handleApproveAction, isA
     if (!viewModeLead) return <Navigate to="/" />;
 
     const leadStatus = viewModeLead.status || 'Pending';
+
     const statusConfig = {
-        'Master': { label: 'Approved', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', dot: 'bg-emerald-500' },
-        'Roaming': { label: 'Roaming', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', dot: 'bg-blue-500' },
-        'Temporarily Closed': { label: 'Pending', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', dot: 'bg-amber-500' },
-        'Pending': { label: 'Pending', bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-100', dot: 'bg-slate-400' }
+        'Master': { label: 'Closed Won', bg: 'bg-emerald-500', text: 'text-white', dot: 'bg-white' },
+        'Roaming': { label: 'Active', bg: 'bg-blue-500', text: 'text-white', dot: 'bg-white' },
+        'Temporarily Closed': { label: 'Pending', bg: 'bg-amber-500', text: 'text-white', dot: 'bg-white' },
+        'Closed Permanently': { label: 'Closed Loss', bg: 'bg-slate-500', text: 'text-white', dot: 'bg-white' },
+        'Pending': { label: 'Pending', bg: 'bg-slate-200', text: 'text-slate-700', dot: 'bg-slate-500' }
     };
 
     const status = statusConfig[leadStatus] || statusConfig['Pending'];
+    const siteVisit = viewModeLead.site_visits?.[0] || {};
+    const isClientAvailable = (viewModeLead.status === 'Temporarily Closed' || siteVisit.is_available === false) ? false : true;
+    const canApprove = user?.role === 'admin' && (viewModeLead.status === 'Roaming' || viewModeLead.status === 'Temporarily Closed');
 
     return (
-        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-            {/* Premium Header */}
-            <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 px-4 py-3 sm:py-4">
-                <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="bg-slate-50 min-h-screen flex flex-col">
+            {/* Sticky App Header */}
+            <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+                <div className="flex items-center gap-3 px-4 py-3">
                     <button
                         onClick={() => navigate(-1)}
-                        className="w-10 h-10 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-600 hover:bg-slate-100 transition-all active:scale-90"
+                        className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center text-slate-700 hover:bg-slate-200 active:scale-90 transition-all shrink-0"
                     >
                         <ChevronLeft size={20} strokeWidth={2.5} />
                     </button>
 
-                    <div className="text-center flex-1 mx-4">
-                        <h1 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">Lead Details</h1>
-                        <p className="text-[10px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                            {viewModeLead.lead_number}
-                        </p>
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-sm font-bold text-slate-900 leading-tight truncate">Lead Details</h1>
+                        <p className="text-[11px] text-slate-400 font-semibold tracking-wider">{viewModeLead.lead_number}</p>
                     </div>
 
-                    <div className={`px-2.5 py-1 rounded-lg border ${status.bg} ${status.text} ${status.border} shadow-sm`}>
-                        <div className="flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full ${status.dot} animate-pulse`} />
-                            <span className="text-[10px] font-black uppercase tracking-tight">{status.label}</span>
-                        </div>
-                    </div>
+                    <span className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-tight flex items-center gap-1.5 shrink-0 ${status.bg} ${status.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${status.dot} animate-pulse`} />
+                        {status.label}
+                    </span>
                 </div>
             </header>
 
-            <main className="flex-1 max-w-2xl mx-auto w-full px-4 sm:px-6 py-6 pb-32 sm:pb-12">
+            {/* Scrollable Content */}
+            <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-4 pb-36 space-y-3">
                 <Summary data={viewModeLead} isReview={false} />
-
-                {/* Admin Actions Bar */}
-                {user?.role === 'admin' && (viewModeLead.status === 'Roaming' || viewModeLead.status === 'Temporarily Closed') && (
-                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/60 backdrop-blur-xl border-t border-slate-200 z-40 sm:sticky sm:bottom-6 sm:bg-transparent sm:border-0 sm:p-0 sm:mt-10">
-                        <div className="max-w-2xl mx-auto flex gap-3">
-                            {(() => {
-                                const siteVisit = viewModeLead.site_visits?.[0] || {};
-                                const isClientAvailable = viewModeLead.status === 'Temporarily Closed' || siteVisit.is_available === false ? false : true;
-
-                                return (
-                                    <motion.button
-                                        whileTap={isClientAvailable ? { scale: 0.95 } : {}}
-                                        onClick={() => isClientAvailable && handleApproveAction(viewModeLead)}
-                                        disabled={isActionLoading || !isClientAvailable}
-                                        className={`flex-[2] py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${isClientAvailable
-                                            ? 'bg-emerald-600 text-white shadow-emerald-200'
-                                            : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
-                                            }`}
-                                    >
-                                        {isActionLoading ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
-                                        <span>
-                                            {!isClientAvailable ? 'Cannot Approve (Unavailable)' : (isActionLoading ? 'Approving...' : 'Approve Lead')}
-                                        </span>
-                                    </motion.button>
-                                );
-                            })()}
-                            <motion.button
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setShowRejectionModal(true)}
-                                disabled={isActionLoading}
-                                className="flex-1 py-4 bg-white text-rose-600 border-2 border-rose-50 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-50"
-                            >
-                                <XCircle size={20} />
-                                <span>Reject</span>
-                            </motion.button>
-                        </div>
-                    </div>
-                )}
             </main>
 
-            {/* Premium Rejection Modal */}
+            {/* Admin Action Bar - Fixed Bottom */}
+            {canApprove && (
+                <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 z-50 px-4 py-3 safe-area-inset-bottom">
+                    <div className="max-w-2xl mx-auto flex gap-3">
+                        <motion.button
+                            whileTap={isClientAvailable ? { scale: 0.95 } : {}}
+                            onClick={() => isClientAvailable && handleApproveAction(viewModeLead)}
+                            disabled={isActionLoading || !isClientAvailable}
+                            className={`flex-[2] py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg text-sm ${isClientAvailable
+                                ? 'bg-emerald-600 text-white shadow-emerald-200 active:bg-emerald-700'
+                                : 'bg-slate-100 text-slate-400 shadow-none cursor-not-allowed'
+                                }`}
+                        >
+                            {isActionLoading ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+                            <span>{!isClientAvailable ? 'Client Unavailable' : isActionLoading ? 'Approving...' : 'Approve Lead'}</span>
+                        </motion.button>
+
+                        <motion.button
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowRejectionModal(true)}
+                            disabled={isActionLoading}
+                            className="flex-1 py-3.5 bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-2xl font-bold flex items-center justify-center gap-2 text-sm transition-all active:bg-rose-100 disabled:opacity-50"
+                        >
+                            <XCircle size={18} />
+                            <span>Reject</span>
+                        </motion.button>
+                    </div>
+                </div>
+            )}
+
+            {/* Rejection Modal - Bottom Sheet */}
             <AnimatePresence>
                 {showRejectionModal && (
-                    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+                    <div className="fixed inset-0 z-[100] flex items-end justify-center">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -196,49 +190,52 @@ const LeadDetailView = ({ viewModeLead, navigate, user, handleApproveAction, isA
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
                             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="relative bg-white p-6 sm:p-8 rounded-t-[2.5rem] sm:rounded-3xl w-full max-w-md shadow-2xl overflow-hidden"
+                            className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-2xl overflow-hidden"
                         >
-                            <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6 sm:hidden" />
+                            {/* Drag Handle */}
+                            <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mt-3 mb-5" />
 
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600">
-                                        <XCircle size={24} />
+                            <div className="px-5 pb-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600">
+                                            <XCircle size={22} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base font-bold text-slate-900">Need Changes?</h3>
+                                            <p className="text-xs text-slate-400 font-medium">Lead #{viewModeLead?.lead_number}</p>
+                                        </div>
                                     </div>
-                                    <h3 className="text-xl font-bold text-slate-900">Need Changes?</h3>
+                                    <button
+                                        onClick={() => setShowRejectionModal(false)}
+                                        className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center transition-colors"
+                                    >
+                                        <X size={16} className="text-slate-500" />
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={() => setShowRejectionModal(false)}
-                                    className="p-2 bg-slate-50 hover:bg-slate-100 rounded-full transition-colors"
-                                >
-                                    <X size={20} className="text-slate-400" />
-                                </button>
-                            </div>
-                            <p className="text-sm text-slate-500 font-medium mb-6 px-1">
-                                Please specify what needs to be fixed for lead <span className="text-indigo-600 font-bold">#{viewModeLead?.lead_number}</span>.
-                            </p>
 
-                            <textarea
-                                value={rejectionReason}
-                                onChange={(e) => setRejectionReason(e.target.value)}
-                                placeholder="Write your feedback here..."
-                                className="w-full h-40 p-5 bg-slate-50 border-2 border-slate-100 rounded-3xl focus:bg-white focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all resize-none text-sm font-semibold mb-6 placeholder:text-slate-300"
-                            />
+                                <textarea
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Describe what needs to be corrected..."
+                                    className="w-full h-32 p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all resize-none text-sm font-medium mb-4 placeholder:text-slate-300"
+                                />
 
-                            <div className="flex gap-3">
-                                <button
-                                    onClick={() => setShowRejectionModal(false)}
-                                    className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold active:scale-95 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleRejectAction}
-                                    disabled={isActionLoading || !rejectionReason.trim()}
-                                    className="flex-[2] py-4 bg-rose-600 text-white rounded-2xl font-bold active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-rose-200"
-                                >
-                                    {isActionLoading ? 'Processing...' : 'Confirm Rejection'}
-                                </button>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setShowRejectionModal(false)}
+                                        className="flex-1 py-3.5 bg-slate-100 text-slate-600 rounded-2xl font-bold text-sm active:scale-95 transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleRejectAction}
+                                        disabled={isActionLoading || !rejectionReason.trim()}
+                                        className="flex-[2] py-3.5 bg-rose-600 text-white rounded-2xl font-bold text-sm active:scale-95 transition-all disabled:opacity-50 shadow-lg shadow-rose-200"
+                                    >
+                                        {isActionLoading ? 'Processing...' : 'Confirm Rejection'}
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
@@ -258,7 +255,7 @@ const LeadFormView = ({
             <header className="bg-white border-b border-slate-200 px-4 py-3 shrink-0 sticky top-0 z-20">
                 <div className="flex items-center justify-between">
                     <button
-                        onClick={() => navigate(user.role === 'admin' ? '/admin' : '/engineer')}
+                        onClick={() => navigate(user.role === 'admin' ? '/admin' : '/field-survey')}
                         className="p-2 -ml-2 active:bg-slate-100 rounded-full transition-colors"
                     >
                         <X size={24} className="text-slate-700" />
@@ -355,14 +352,14 @@ const LeadFormView = ({
 
 function App() {
     const [user, setUser] = useState(null);
-    const [showForm, setShowForm] = useState(() => localStorage.getItem('leadpro_show_form') === 'true');
+    const [showForm, setShowForm] = useState(() => localStorage.getItem('durkkas_show_form') === 'true');
     const [viewModeLead, setViewModeLead] = useState(() => {
-        const saved = localStorage.getItem('leadpro_view_lead');
+        const saved = localStorage.getItem('durkkas_view_lead');
         return saved ? JSON.parse(saved) : null;
     });
-    const [currentStep, setCurrentStep] = useState(() => Number(localStorage.getItem('leadpro_current_step')) || 0);
+    const [currentStep, setCurrentStep] = useState(() => Number(localStorage.getItem('durkkas_current_step')) || 0);
     const [formData, setFormData] = useState(() => {
-        const saved = localStorage.getItem('leadpro_form_data');
+        const saved = localStorage.getItem('durkkas_form_data');
         return saved ? JSON.parse(saved) : INITIAL_LEAD_DATA;
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -375,10 +372,10 @@ function App() {
 
     // PERSISTENCE: Save state when it changes
     useEffect(() => {
-        localStorage.setItem('leadpro_show_form', showForm);
-        localStorage.setItem('leadpro_view_lead', viewModeLead ? JSON.stringify(viewModeLead) : '');
-        localStorage.setItem('leadpro_current_step', currentStep);
-        localStorage.setItem('leadpro_form_data', JSON.stringify(formData));
+        localStorage.setItem('durkkas_show_form', showForm);
+        localStorage.setItem('durkkas_view_lead', viewModeLead ? JSON.stringify(viewModeLead) : '');
+        localStorage.setItem('durkkas_current_step', currentStep);
+        localStorage.setItem('durkkas_form_data', JSON.stringify(formData));
     }, [showForm, viewModeLead, currentStep, formData]);
 
     const mainContentRef = useRef(null);
@@ -386,8 +383,8 @@ function App() {
 
     // SESSION PERSISTENCE (Tab Specific): Load user from sessionStorage on mount
     useEffect(() => {
-        const storedUser = sessionStorage.getItem('leadpro_session');
-        const lastActivity = sessionStorage.getItem('leadpro_last_activity');
+        const storedUser = sessionStorage.getItem('durkkas_session');
+        const lastActivity = sessionStorage.getItem('durkkas_last_activity');
 
         if (storedUser && lastActivity) {
             const now = Date.now();
@@ -399,7 +396,7 @@ function App() {
                     const parsedUser = JSON.parse(storedUser);
                     setUser(parsedUser);
                     // Refresh activity on load
-                    sessionStorage.setItem('leadpro_last_activity', Date.now().toString());
+                    sessionStorage.setItem('durkkas_last_activity', Date.now().toString());
                 } catch (err) {
                     console.error("Failed to parse stored user session", err);
                     handleLogout();
@@ -414,12 +411,12 @@ function App() {
         if (!user) return;
 
         const updateActivity = () => {
-            sessionStorage.setItem('leadpro_last_activity', Date.now().toString());
+            sessionStorage.setItem('durkkas_last_activity', Date.now().toString());
         };
 
         // Check for timeout every 30 seconds
         const checkInterval = setInterval(() => {
-            const lastActivity = sessionStorage.getItem('leadpro_last_activity');
+            const lastActivity = sessionStorage.getItem('durkkas_last_activity');
             if (lastActivity && Date.now() - parseInt(lastActivity) > IDLE_TIMEOUT) {
                 // Instead of alert, redirect to session-expired
                 handleLogout(true);
@@ -446,12 +443,12 @@ function App() {
     const handleLogin = (role, email, id, fullName) => {
         const userData = { role, email, id, fullName };
         setUser(userData);
-        sessionStorage.setItem('leadpro_session', JSON.stringify(userData));
-        sessionStorage.setItem('leadpro_last_activity', Date.now().toString());
+        sessionStorage.setItem('durkkas_session', JSON.stringify(userData));
+        sessionStorage.setItem('durkkas_last_activity', Date.now().toString());
 
         // Navigate based on role after login
         if (role === 'admin') navigate('/admin');
-        else navigate('/engineer');
+        else navigate('/field-survey');
     };
 
     const handleLogout = (isExpired = false) => {
@@ -462,14 +459,14 @@ function App() {
         setFormData(INITIAL_LEAD_DATA);
         setFormData(INITIAL_LEAD_DATA);
         setEditingLeadId(null);
-        localStorage.removeItem('leadpro_session');
-        sessionStorage.removeItem('leadpro_last_activity');
+        localStorage.removeItem('durkkas_session');
+        sessionStorage.removeItem('durkkas_last_activity');
         localStorage.removeItem('admin_active_view');
         localStorage.removeItem('engineer_active_view');
-        localStorage.removeItem('leadpro_show_form');
-        localStorage.removeItem('leadpro_view_lead');
-        localStorage.removeItem('leadpro_current_step');
-        localStorage.removeItem('leadpro_form_data');
+        localStorage.removeItem('durkkas_show_form');
+        localStorage.removeItem('durkkas_view_lead');
+        localStorage.removeItem('durkkas_current_step');
+        localStorage.removeItem('durkkas_form_data');
 
         if (isExpired) {
             navigate('/session-expired');
@@ -538,7 +535,7 @@ function App() {
         const { architectName, architectContact, contractorName, contractorContact } = formData.stakeholders;
         const newErrors = {};
 
-        if (!architectName) newErrors.architectName = 'Architect/Engineer Name is required';
+        if (!architectName) newErrors.architectName = 'Architect/Design Professional Name is required';
 
         const architectContactError = validateMobile(architectContact);
         if (architectContactError) newErrors.architectContact = architectContactError;
@@ -691,7 +688,7 @@ function App() {
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 size={40} className="animate-spin text-emerald-600 mx-auto mb-4" />
-                    <p className="text-slate-600 font-bold">Initializing LeadPro...</p>
+                    <p className="text-slate-600 font-bold">Initializing DurkkasSurveytoLead...</p>
                 </div>
             </div>
         );
@@ -705,7 +702,7 @@ function App() {
             <ScrollToTop />
             <Routes>
                 <Route path="/session-expired" element={<SessionExpired />} />
-                <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to={user.role === 'admin' ? '/admin' : '/engineer'} />} />
+                <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to={user.role === 'admin' ? '/admin' : '/field-survey'} />} />
 
                 <Route path="/admin/*" element={
                     user?.role === 'admin' ? (
@@ -750,9 +747,9 @@ function App() {
                     ) : <Navigate to="/login" />
                 } />
 
-                <Route path="/engineer/*" element={
-                    (user?.role === 'engineer' || user?.role === 'user' || user?.role === 'field engineer') ? (
-                        <EngineerDashboard
+                <Route path="/field-survey/*" element={
+                    (user?.role === 'engineer' || user?.role === 'user' || user?.role === 'field engineer' || user?.role === 'field survey person') ? (
+                        <FieldSurveyDashboard
                             user={user}
                             onLogout={handleLogout}
                             onNewLead={() => {
@@ -760,7 +757,7 @@ function App() {
                                 setEditingLeadId(null);
                                 setCurrentStep(0);
                                 setIsSubmitted(false);
-                                navigate('/engineer/new');
+                                navigate('/field-survey/new');
                             }}
                             onEditLead={(lead) => {
                                 const mappedData = mapDbLeadToFormData(lead);
@@ -769,10 +766,10 @@ function App() {
                                     setEditingLeadId(lead.id);
                                     setCurrentStep(0);
                                     setIsSubmitted(false);
-                                    navigate('/engineer/new');
+                                    navigate('/field-survey/new');
                                 }
                             }}
-                            onView={(l) => { setViewModeLead(l); navigate('/engineer/view'); }}
+                            onView={(l) => { setViewModeLead(l); navigate('/field-survey/view'); }}
                             LeadFormView={<LeadFormView
                                 user={user}
                                 navigate={navigate}
@@ -809,7 +806,7 @@ function App() {
                     ) : <Navigate to="/login" />
                 } />
 
-                <Route path="/" element={<Navigate to={user ? (user.role === 'admin' ? '/admin' : '/engineer') : '/login'} />} />
+                <Route path="/" element={<Navigate to={user ? (user.role === 'admin' ? '/admin' : '/field-survey') : '/login'} />} />
             </Routes>
         </>
     );

@@ -45,6 +45,16 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+html {
+  font-size: 14px; /* Smaller base font for mobile */
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 16px; /* Standard base font for tablet/desktop */
+  }
+}
+
 /* Scrollbar Styling - Extremely Visible */
 ::-webkit-scrollbar {
   width: 14px;

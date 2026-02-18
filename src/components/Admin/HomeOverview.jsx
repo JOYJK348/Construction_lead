@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
     FileText, Clock, CheckCircle2, Bell, TrendingUp, Activity,
-    Users, MapPin, Calendar, Plus, ChevronRight, BarChart3, Award
+    Users, MapPin, Calendar, Plus, ChevronRight, BarChart3, Award, XCircle
 } from 'lucide-react';
 
 const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
@@ -22,22 +22,23 @@ const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
         return new Date(l.created_at) >= weekAgo;
     }).length;
 
-    // Engineer performance summary
-    const engineerStats = leads.reduce((acc, lead) => {
-        const engineerName = lead.assignments?.[0]?.engineer?.full_name || 'Unassigned';
-        if (!acc[engineerName]) {
-            acc[engineerName] = { total: 0, completed: 0, pending: 0 };
+    // Field Survey Person performance summary
+    const surveyPersonStats = leads.reduce((acc, lead) => {
+        const surveyPersonName = lead.assignments?.[0]?.engineer?.full_name || 'Unassigned';
+        if (!acc[surveyPersonName]) {
+            acc[surveyPersonName] = { total: 0, completed: 0, pending: 0 };
         }
-        acc[engineerName].total++;
+        acc[surveyPersonName].total++;
 
         const status = String(lead.status || '').toLowerCase();
-        if (status === 'master') acc[engineerName].completed++;
-        if (status === 'roaming') acc[engineerName].pending++;
+        if (status === 'master') acc[surveyPersonName].completed++;
+        if (status === 'roaming') acc[surveyPersonName].pending++;
+        if (status === 'closed permanently') acc[surveyPersonName].lost++;
 
         return acc;
     }, {});
 
-    const topEngineers = Object.entries(engineerStats)
+    const topSurveyPersons = Object.entries(surveyPersonStats)
         .sort((a, b) => b[1].completed - a[1].completed)
         .slice(0, 3);
 
@@ -72,41 +73,41 @@ const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
                             </p>
                         </div>
                         <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/20 transition-transform active:scale-95 sm:hover:scale-105">
-                            <p className="text-white/80 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Engineers</p>
-                            <p className="text-2xl sm:text-3xl font-bold text-white mt-1">{stats.engineersCount || 0}</p>
+                            <p className="text-white/80 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Field Surveyors</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-white mt-1">{stats.surveyPersonsCount || 0}</p>
                         </div>
                     </div>
                 </div>
             </motion.div>
 
             {/* Stats Cards Grid - Mobile Optimized */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 <StatCard
                     icon={FileText}
-                    label="Total Leads"
+                    label="Total Analysis"
                     value={stats.total}
                     color="from-blue-500 to-indigo-600"
                     onClick={() => navigate('/admin/leads')}
                 />
                 <StatCard
                     icon={Clock}
-                    label="Pending"
-                    value={stats.pending}
-                    color="from-amber-500 to-orange-600"
+                    label="Active"
+                    value={stats.underConstruction}
+                    color="from-blue-400 to-indigo-500"
                     onClick={() => navigate('/admin/leads')}
                 />
                 <StatCard
                     icon={CheckCircle2}
-                    label="Completed"
-                    value={stats.completed}
+                    label="Closed Won"
+                    value={stats.closedWon}
                     color="from-emerald-500 to-teal-600"
                     onClick={() => navigate('/admin/archive')}
                 />
                 <StatCard
                     icon={Bell}
-                    label="Reminders"
-                    value={stats.reminders}
-                    color="from-rose-500 to-pink-600"
+                    label="Pending"
+                    value={stats.pending}
+                    color="from-amber-500 to-orange-600"
                     onClick={() => navigate('/admin/reminders')}
                 />
             </div>
@@ -189,7 +190,7 @@ const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
             </div>
 
             {/* Top Performers - Mobile Optimized */}
-            {topEngineers.length > 0 && (
+            {topSurveyPersons.length > 0 && (
                 <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -198,7 +199,7 @@ const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
                         </h3>
                     </div>
                     <div className="space-y-3">
-                        {topEngineers.map(([name, data], index) => (
+                        {topSurveyPersons.map(([name, data], index) => (
                             <div key={name} className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl hover:bg-slate-50 transition-all">
                                 <div className={`
                                     w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm
@@ -244,15 +245,18 @@ const StatCard = ({ icon: Icon, label, value, color, onClick }) => (
 const StatusBadge = ({ status }) => {
     const getStatusStyle = () => {
         const s = String(status || '').toLowerCase();
-        if (s === 'master') return 'bg-emerald-50 text-emerald-700 border-emerald-100';
-        if (s === 'roaming') return 'bg-amber-50 text-amber-700 border-amber-100';
-        if (s === 'temporarily closed') return 'bg-rose-50 text-rose-700 border-rose-100';
-        return 'bg-slate-50 text-slate-600 border-slate-100';
+        if (s === 'master') return { style: 'bg-emerald-50 text-emerald-700 border-emerald-100', label: 'Closed Won' };
+        if (s === 'roaming') return { style: 'bg-blue-50 text-blue-700 border-blue-100', label: 'Under Construction' };
+        if (s === 'temporarily closed') return { style: 'bg-amber-50 text-amber-700 border-amber-100', label: 'Pending' };
+        if (s === 'closed permanently') return { style: 'bg-slate-50 text-slate-700 border-slate-200', label: 'Closed Loss' };
+        return { style: 'bg-slate-50 text-slate-600 border-slate-100', label: status || 'Unknown' };
     };
 
+    const config = getStatusStyle();
+
     return (
-        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${getStatusStyle()}`}>
-            {status || 'Unknown'}
+        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border ${config.style}`}>
+            {config.label}
         </span>
     );
 };

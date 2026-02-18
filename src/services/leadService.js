@@ -33,6 +33,7 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
             leadNumber = updateData.lead_number;
         } else {
             // Insert mode
+            const now = new Date();
             leadNumber = formData.customer.leadNumber || `CL-${now.getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}-${String(now.getSeconds()).padStart(2, '0')}`;
             const { data: leadData, error: leadError } = await supabase
                 .from('leads')
@@ -147,7 +148,7 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
             engineer_id: userId,
             is_available: isClientAvailable,
             visit_notes: isClientAvailable
-                ? 'Data updated by engineer'
+                ? 'Data updated by Field Survey Person'
                 : `Update: Client Unavailable. Follow-up: ${formData.customer.followUpDate}`,
             latitude: visitLocation.latitude,
             longitude: visitLocation.longitude,
@@ -228,7 +229,7 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
             const { data: userData } = await supabase.from('users').select('role, full_name').eq('id', userId).single();
             const userRole = userData?.role?.toLowerCase();
 
-            if (!existingLeadId && (userRole === 'engineer' || userRole === 'user' || userRole === 'field engineer')) {
+            if (!existingLeadId && (userRole === 'engineer' || userRole === 'user' || userRole === 'field engineer' || userRole === 'field survey person')) {
                 await supabase.from('lead_assignments').insert([{
                     lead_id: leadId,
                     engineer_id: userId,
@@ -374,12 +375,13 @@ export const rejectLead = async (lead, reason) => {
 /**
  * Permanently close a lead (Archive/Hide from all views)
  */
-export const closePermanently = async (lead) => {
+export const closePermanently = async (lead, reason) => {
     try {
         const { error } = await supabase
             .from('leads')
             .update({
                 status: 'Closed Permanently',
+                status_reason: reason,
                 updated_at: new Date().toISOString()
             })
             .eq('id', lead.id);

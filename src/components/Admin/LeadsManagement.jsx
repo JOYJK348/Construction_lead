@@ -11,12 +11,13 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterVillage, setFilterVillage] = useState('all');
-    const [filterEngineer, setFilterEngineer] = useState('all');
+    const [filterSurveyPerson, setFilterSurveyPerson] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const [showReasonModal, setShowReasonModal] = useState(false);
     const [showCloseModal, setShowCloseModal] = useState(false);
     const [selectedLead, setSelectedLead] = useState(null);
     const [rejectionReason, setRejectionReason] = useState('');
+    const [closeReason, setCloseReason] = useState('');
     const [sortBy, setSortBy] = useState('date_desc');
 
     React.useEffect(() => {
@@ -30,9 +31,9 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
         };
     }, [showReasonModal, showCloseModal]);
 
-    // Get unique villages and engineers for filters
+    // Get unique villages and survey persons for filters
     const villages = [...new Set(leads.map(l => l.site_visits?.[0]?.village_name).filter(Boolean))];
-    const engineers = [...new Set(leads.map(l => l.assignments?.[0]?.engineer?.full_name).filter(Boolean))];
+    const surveyPersons = [...new Set(leads.map(l => l.assignments?.[0]?.engineer?.full_name).filter(Boolean))];
 
     // Filter and sort leads
     let filteredLeads = leads.filter(lead => {
@@ -46,9 +47,9 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
         const isClosed = lead.status === 'Closed Permanently';
         const matchesStatus = filterStatus === 'all' ? (!isMaster && !isClosed) : lead.status === filterStatus;
         const matchesVillage = filterVillage === 'all' || lead.site_visits?.[0]?.village_name === filterVillage;
-        const matchesEngineer = filterEngineer === 'all' || lead.assignments?.[0]?.engineer?.full_name === filterEngineer;
+        const matchesSurveyPerson = filterSurveyPerson === 'all' || lead.assignments?.[0]?.engineer?.full_name === filterSurveyPerson;
 
-        return matchesSearch && matchesStatus && matchesVillage && matchesEngineer;
+        return matchesSearch && matchesStatus && matchesVillage && matchesSurveyPerson;
     });
 
     // Sort leads
@@ -105,10 +106,15 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
 
     const confirmClosePermanently = async () => {
         if (!selectedLead) return;
+        if (!closeReason.trim()) {
+            alert('Please provide a reason for closing as loss');
+            return;
+        }
 
-        const result = await closePermanently(selectedLead);
+        const result = await closePermanently(selectedLead, closeReason);
         if (result.success) {
             setShowCloseModal(false);
+            setCloseReason('');
             setSelectedLead(null);
             fetchLeads();
         } else {
@@ -118,7 +124,7 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
 
 
 
-    const activeFiltersCount = [filterStatus, filterVillage, filterEngineer].filter(f => f !== 'all').length;
+    const activeFiltersCount = [filterStatus, filterVillage, filterSurveyPerson].filter(f => f !== 'all').length;
 
     return (
         <div className="space-y-4 sm:space-y-6 pb-6">
@@ -191,8 +197,9 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
                                         className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border-2 border-slate-200 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm text-slate-900 focus:border-indigo-500 outline-none"
                                     >
                                         <option value="all">All Active</option>
-                                        <option value="Roaming">Roaming (Pending)</option>
-                                        <option value="Temporarily Closed">Temporarily Closed</option>
+                                        <option value="Roaming">Under Construction</option>
+                                        <option value="Temporarily Closed">Pending</option>
+                                        <option value="Closed Permanently">Closed Loss</option>
                                     </select>
                                 </div>
                                 <div>
@@ -207,14 +214,14 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] sm:text-xs font-semibold text-slate-700 mb-1.5 block">Engineer</label>
+                                    <label className="text-[10px] sm:text-xs font-semibold text-slate-700 mb-1.5 block">Field Survey Person</label>
                                     <select
-                                        value={filterEngineer}
-                                        onChange={(e) => setFilterEngineer(e.target.value)}
+                                        value={filterSurveyPerson}
+                                        onChange={(e) => setFilterSurveyPerson(e.target.value)}
                                         className="w-full px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border-2 border-slate-200 rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm text-slate-900 focus:border-indigo-500 outline-none"
                                     >
-                                        <option value="all">All Engineers</option>
-                                        {engineers.map(e => <option key={e} value={e}>{e}</option>)}
+                                        <option value="all">All Survey Persons</option>
+                                        {surveyPersons.map(e => <option key={e} value={e}>{e}</option>)}
                                     </select>
                                 </div>
                                 <div>
@@ -338,17 +345,26 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex flex-col items-center text-center">
-                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-900 mb-4">
-                                    <AlertCircle size={32} />
+                                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-600 mb-4 shadow-sm border border-red-100">
+                                    <XCircle size={32} />
                                 </div>
-                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Close Lead Permanently?</h3>
+                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Close as Loss</h3>
                                 <p className="text-slate-600 font-medium text-sm sm:text-base mb-6 px-2">
-                                    Are you sure you want to close lead <span className="font-bold text-slate-900">#{selectedLead?.lead_number}</span>? This action will hide it from everyone and cannot be undone easily.
+                                    Explain why project <span className="font-bold text-slate-900">#{selectedLead?.lead_number}</span> is being marked as a loss.
                                 </p>
+
+                                <textarea
+                                    className="w-full h-28 sm:h-32 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border-2 border-slate-200 rounded-xl font-medium text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-red-500 outline-none transition-all resize-none mb-6"
+                                    placeholder="Enter reason for loss (e.g., Client cancelled, Price issue, etc.)..."
+                                    value={closeReason}
+                                    onChange={(e) => setCloseReason(e.target.value)}
+                                />
+
                                 <div className="flex flex-col sm:flex-row gap-3 w-full">
                                     <button
                                         onClick={() => {
                                             setShowCloseModal(false);
+                                            setCloseReason('');
                                             setSelectedLead(null);
                                         }}
                                         className="flex-1 py-3.5 px-4 font-bold text-sm sm:text-base text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95"
@@ -357,9 +373,9 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
                                     </button>
                                     <button
                                         onClick={confirmClosePermanently}
-                                        className="flex-1 py-3.5 px-4 bg-slate-900 text-white rounded-xl font-bold text-sm sm:text-base hover:bg-black transition-all shadow-lg active:scale-95"
+                                        className="flex-1 py-3.5 px-4 bg-red-600 text-white rounded-xl font-bold text-sm sm:text-base hover:bg-red-700 transition-all shadow-lg active:scale-95"
                                     >
-                                        Yes, Close Permanently
+                                        Confirm Loss
                                     </button>
                                 </div>
                             </div>
@@ -381,9 +397,10 @@ const LeadCard = ({ lead, onView, onApprove, onReject, onClosePermanently }) => 
     const isWaiting = projName.includes('unknown') || custName.includes('unavailable') || custName.includes('unknown');
 
     const statusConfig = {
-        'Master': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', label: 'Completed', icon: CheckCircle },
-        'Roaming': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', label: 'Pending', icon: Clock },
-        'Temporarily Closed': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', label: 'Update Needed', icon: AlertCircle },
+        'Master': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100', label: 'Closed Won', icon: CheckCircle },
+        'Roaming': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100', label: 'Under Construction', icon: Clock },
+        'Temporarily Closed': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100', label: 'Pending', icon: AlertCircle },
+        'Closed Permanently': { bg: 'bg-slate-50', text: 'text-slate-500', border: 'border-slate-200', label: 'Closed Loss', icon: XCircle },
         'Waiting': { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-100', label: 'Waiting', icon: Clock }
     };
 
@@ -433,7 +450,7 @@ const LeadCard = ({ lead, onView, onApprove, onReject, onClosePermanently }) => 
             {/* Details Section */}
             <div className="bg-slate-50 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 space-y-2 border border-slate-100">
                 <div className="flex items-center justify-between text-[10px] sm:text-xs">
-                    <span className="text-slate-500 font-semibold uppercase tracking-tight">Engineer</span>
+                    <span className="text-slate-500 font-semibold uppercase tracking-tight">Field Survey Person</span>
                     <span className="font-bold text-slate-900 truncate max-w-[140px] sm:max-w-[180px]">
                         {lead.assignments?.[0]?.engineer?.full_name || 'Unassigned'}
                     </span>
@@ -491,16 +508,19 @@ const LeadCard = ({ lead, onView, onApprove, onReject, onClosePermanently }) => 
                         onClick={() => onClosePermanently(lead)}
                         className="w-full py-2 sm:py-2.5 bg-slate-50 hover:bg-slate-900 border border-slate-200 hover:text-white rounded-lg sm:rounded-xl font-bold text-slate-400 text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all active:scale-95"
                     >
-                        <X size={14} /> Close Permanently
+                        <X size={14} /> Close as Loss
                     </button>
                 )}
 
-                {lead.status === 'Temporarily Closed' && (
-                    <div className="flex items-center gap-2 p-2.5 sm:p-3 bg-amber-50 border border-amber-200 rounded-lg sm:rounded-xl">
-                        <AlertCircle size={14} className="sm:w-4 sm:h-4 text-amber-600 shrink-0" />
+                {(lead.status === 'Temporarily Closed' || lead.status === 'Closed Permanently') && (
+                    <div className={`
+                        flex items-center gap-2 p-2.5 sm:p-3 rounded-lg sm:rounded-xl border
+                        ${lead.status === 'Closed Permanently' ? 'bg-slate-50 border-slate-200' : 'bg-amber-50 border-amber-200'}
+                    `}>
+                        <AlertCircle size={14} className={`sm:w-4 sm:h-4 shrink-0 ${lead.status === 'Closed Permanently' ? 'text-slate-600' : 'text-amber-600'}`} />
                         <div className="flex-1 min-w-0">
-                            <p className="text-[9px] sm:text-[10px] font-bold text-amber-800 uppercase">Reason</p>
-                            <p className="text-[10px] sm:text-xs text-amber-900 truncate">{lead.status_reason}</p>
+                            <p className={`text-[9px] sm:text-[10px] font-bold uppercase ${lead.status === 'Closed Permanently' ? 'text-slate-500' : 'text-amber-800'}`}>Reason</p>
+                            <p className={`text-[10px] sm:text-xs truncate ${lead.status === 'Closed Permanently' ? 'text-slate-700' : 'text-amber-900'}`}>{lead.status_reason}</p>
                         </div>
                     </div>
                 )}

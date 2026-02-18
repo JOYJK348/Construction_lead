@@ -11,14 +11,14 @@ import { exportToExcel, exportToPDF, getPDFBlobURL } from '../../services/export
 const ReportsExports = ({ leads, onView }) => {
     const navigate = useNavigate();
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
-    const [filterEngineer, setFilterEngineer] = useState('all');
+    const [filterSurveyPerson, setFilterSurveyPerson] = useState('all');
     const [filterVillage, setFilterVillage] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
 
-    // Get unique engineers and villages
-    const engineers = [...new Set(leads.map(l => l.assignments?.[0]?.engineer?.full_name).filter(Boolean))].sort();
+    // Get unique survey persons and villages
+    const surveyPersons = [...new Set(leads.map(l => l.assignments?.[0]?.engineer?.full_name).filter(Boolean))].sort();
     const villages = [...new Set(leads.map(l => l.site_visits?.[0]?.village_name).filter(Boolean))].sort();
 
     // Filter leads
@@ -52,7 +52,7 @@ const ReportsExports = ({ leads, onView }) => {
                 }
             }
 
-            if (filterEngineer !== 'all' && lead.assignments?.[0]?.engineer?.full_name !== filterEngineer) {
+            if (filterSurveyPerson !== 'all' && lead.assignments?.[0]?.engineer?.full_name !== filterSurveyPerson) {
                 return false;
             }
 
@@ -70,7 +70,7 @@ const ReportsExports = ({ leads, onView }) => {
 
     const resetFilters = () => {
         setDateRange({ start: '', end: '' });
-        setFilterEngineer('all');
+        setFilterSurveyPerson('all');
         setFilterVillage('all');
         setFilterStatus('all');
         setSearchTerm('');
@@ -176,19 +176,19 @@ const ReportsExports = ({ leads, onView }) => {
                         </div>
                     </div>
 
-                    {/* Engineer & Village */}
+                    {/* Field Survey Person & Village */}
                     <div className="space-y-1.5">
-                        <label className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wide ml-1 sm:ml-2">Engineer & Village</label>
+                        <label className="text-[9px] sm:text-[10px] font-semibold text-slate-400 uppercase tracking-wide ml-1 sm:ml-2">Field Survey Person & Village</label>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="relative">
                                 <Users className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
                                 <select
-                                    value={filterEngineer}
-                                    onChange={(e) => setFilterEngineer(e.target.value)}
+                                    value={filterSurveyPerson}
+                                    onChange={(e) => setFilterSurveyPerson(e.target.value)}
                                     className="w-full pl-8 sm:pl-9 pr-2 py-2 sm:py-2.5 bg-slate-50 border-2 border-slate-200 rounded-lg text-[10px] sm:text-xs font-medium text-slate-900 focus:bg-white focus:border-indigo-500 outline-none appearance-none cursor-pointer transition-all"
                                 >
                                     <option value="all">All</option>
-                                    {engineers.map(eng => <option key={eng} value={eng}>{eng}</option>)}
+                                    {surveyPersons.map(eng => <option key={eng} value={eng}>{eng}</option>)}
                                 </select>
                             </div>
                             <div className="relative">
@@ -216,9 +216,10 @@ const ReportsExports = ({ leads, onView }) => {
                                 className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-50 border-2 border-slate-200 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-indigo-500 outline-none appearance-none cursor-pointer transition-all"
                             >
                                 <option value="all">All Statuses</option>
-                                <option value="Roaming">Roaming (Pending)</option>
-                                <option value="Master">Master (Completed)</option>
-                                <option value="Temporarily Closed">Temporarily Closed</option>
+                                <option value="Roaming">Under Construction</option>
+                                <option value="Master">Closed Won</option>
+                                <option value="Temporarily Closed">Pending</option>
+                                <option value="Closed Permanently">Closed Loss</option>
                             </select>
                         </div>
                     </div>
@@ -473,13 +474,15 @@ const StatusBadge = ({ status, project, customer }) => {
     const statusStyles = {
         'Master': 'bg-emerald-50 text-emerald-700 border-emerald-100',
         'Roaming': 'bg-blue-50 text-blue-700 border-blue-100',
-        'Temporarily Closed': 'bg-amber-50 text-amber-700 border-amber-100'
+        'Temporarily Closed': 'bg-amber-50 text-amber-700 border-amber-100',
+        'Closed Permanently': 'bg-slate-50 text-slate-500 border-slate-200'
     };
 
     const statusLabels = {
-        'Master': 'Complete',
-        'Roaming': 'Roaming',
-        'Temporarily Closed': 'Pending'
+        'Master': 'Closed Won',
+        'Roaming': 'Under Construction',
+        'Temporarily Closed': 'Pending',
+        'Closed Permanently': 'Closed Loss'
     };
 
     return (

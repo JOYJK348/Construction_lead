@@ -38,7 +38,7 @@ const StakeholderDetails = ({ data, update, errors = {} }) => {
                         <Compass size={18} className="text-blue-600" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-slate-800">Architect / Engineer</h3>
+                        <h3 className="text-sm font-semibold text-slate-800">Architect / Design Professional</h3>
                         <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Design Professional</p>
                     </div>
                 </div>

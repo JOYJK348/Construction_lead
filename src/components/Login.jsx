@@ -81,10 +81,10 @@ const Login = ({ onLogin }) => {
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="relative inline-block mb-6"
                         >
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/30 transform rotate-3 hover:rotate-6 transition-transform">
-                                <Building2 size={36} className="text-white" strokeWidth={2.5} />
+                            <div className="w-20 h-20 sm:w-28 sm:h-28 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-slate-200 transform rotate-3 hover:rotate-6 transition-transform overflow-hidden border border-slate-100">
+                                <img src="/assests/logo.png" alt="Durkkas Logo" className="w-full h-full object-cover scale-110" />
                             </div>
-                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
                                 <Sparkles size={14} className="text-white" />
                             </div>
                         </motion.div>
@@ -94,10 +94,10 @@ const Login = ({ onLogin }) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
                         >
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-2 tracking-tight">
-                                LeadPro Portal
+                            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight leading-none">
+                                <span className="text-slate-800">Survey</span><span className="text-emerald-500">2</span><span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">Lead</span>
                             </h1>
-                            <p className="text-slate-500 font-semibold text-sm sm:text-base">
+                            <p className="text-slate-400 font-medium text-xs sm:text-sm tracking-widest uppercase">
                                 Construction Lead Management
                             </p>
                         </motion.div>
@@ -112,12 +112,12 @@ const Login = ({ onLogin }) => {
                             transition={{ delay: 0.4 }}
                             className="space-y-2"
                         >
-                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1.5">
+                            <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider ml-1 flex items-center gap-1.5">
                                 <User size={14} />
                                 Username or Email
                             </label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
                                     <User size={20} />
                                 </div>
                                 <input
@@ -126,7 +126,7 @@ const Login = ({ onLogin }) => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Enter your username or email"
-                                    className="w-full bg-slate-50/50 border-2 border-slate-200 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-12 pr-4 font-semibold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-400 placeholder:font-normal text-sm sm:text-base"
+                                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-12 pr-4 font-semibold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-400 placeholder:font-normal text-sm sm:text-base"
                                     required
                                     disabled={isLoading}
                                     autoComplete="off"
@@ -141,12 +141,12 @@ const Login = ({ onLogin }) => {
                             transition={{ delay: 0.5 }}
                             className="space-y-2"
                         >
-                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1.5">
+                            <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider ml-1 flex items-center gap-1.5">
                                 <Lock size={14} />
                                 Password
                             </label>
                             <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
                                     <Lock size={20} />
                                 </div>
                                 <input
@@ -155,7 +155,7 @@ const Login = ({ onLogin }) => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter your password"
-                                    className="w-full bg-slate-50/50 border-2 border-slate-200 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-12 pr-12 font-semibold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-400 placeholder:font-normal text-sm sm:text-base"
+                                    className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-12 pr-12 font-semibold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-400 placeholder:font-normal text-sm sm:text-base"
                                     required
                                     disabled={isLoading}
                                     autoComplete="new-password"
@@ -163,7 +163,7 @@ const Login = ({ onLogin }) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none p-1 rounded-lg hover:bg-slate-100 active:scale-95"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors focus:outline-none p-1 rounded-lg hover:bg-slate-100 active:scale-95"
                                     title={showPassword ? "Hide password" : "Show password"}
                                 >
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -214,7 +214,7 @@ const Login = ({ onLogin }) => {
                         transition={{ delay: 0.7 }}
                         className="mt-6 sm:mt-8 text-center"
                     >
-                        <p className="text-xs sm:text-sm text-slate-400 font-medium">
+                        <p className="text-xs sm:text-sm text-slate-600 font-semibold">
                             Secure access for authorized personnel only
                         </p>
                     </motion.div>
@@ -227,8 +227,11 @@ const Login = ({ onLogin }) => {
                     transition={{ delay: 0.8 }}
                     className="mt-6 text-center"
                 >
+                    <p className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest mb-1.5 opacity-60">
+                        Version 1.0
+                    </p>
                     <p className="text-xs sm:text-sm text-slate-400 font-semibold px-4">
-                        Powered by <span className="text-slate-900 font-bold">LeadPro</span> © 2026
+                        Powered by <span className="text-slate-900 font-bold">Durkkas</span> © 2026
                     </p>
                 </motion.div>
             </motion.div>

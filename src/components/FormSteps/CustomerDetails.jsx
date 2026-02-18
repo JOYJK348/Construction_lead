@@ -109,7 +109,7 @@ const CustomerDetails = ({ data, update, errors = {} }) => {
         <div className="space-y-5">
             {/* Header with Icon and Title */}
             <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
                     <User size={32} className="text-white" />
                 </div>
                 <h2 className="text-2xl font-semibold text-slate-900 mb-2">Customer Information</h2>

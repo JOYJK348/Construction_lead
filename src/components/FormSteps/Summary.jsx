@@ -237,7 +237,7 @@ const Summary = ({ data, isReview = true }) => {
                         <SectionCard icon={Users} title="Stakeholder Network" variant="indigo">
                             <div className="grid grid-cols-1 gap-6">
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-4">
-                                    <DataRow label="Architect / Engineer" value={stakeholders.architectName} icon={User} />
+                                    <DataRow label="Architect / Design Professional" value={stakeholders.architectName} icon={User} />
                                     <DataRow label="Architect Contact" value={stakeholders.architectContact} icon={Phone} />
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col gap-4">

@@ -64,7 +64,7 @@ export const DOOR_TYPES = {
 
 // Payment Roles / Responsible Party
 export const PAYMENT_METHODS = [
-    'Engineer / Builder',
+    'Field Survey Person / Builder',
     'Party / Customer'
 ];
 

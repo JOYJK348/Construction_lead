@@ -12,7 +12,7 @@ import NotificationCenter from './NotificationCenter';
 import { checkAndCreateFollowUpNotifications } from '../services/notificationService';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 
-const EngineerDashboard = ({
+const FieldSurveyDashboard = ({
     user, onLogout, onNewLead, onEditLead, onView,
     LeadFormView, LeadSuccessView, LeadDetailView, isSubmitted
 }) => {
@@ -22,13 +22,13 @@ const EngineerDashboard = ({
     // Determine activeView from current path
     const getActiveView = () => {
         const path = location.pathname;
-        if (path.includes('/engineer/my-leads')) return 'my-leads';
-        if (path.includes('/engineer/new')) return 'new-entry';
-        if (path.includes('/engineer/pending')) return 'pending';
-        if (path.includes('/engineer/completed')) return 'completed';
-        if (path.includes('/engineer/notifications')) return 'notifications';
-        if (path.includes('/engineer/profile')) return 'profile';
-        if (path.includes('/engineer/view')) return 'view';
+        if (path.includes('/field-survey/my-leads')) return 'my-leads';
+        if (path.includes('/field-survey/new')) return 'new-entry';
+        if (path.includes('/field-survey/pending')) return 'pending';
+        if (path.includes('/field-survey/completed')) return 'completed';
+        if (path.includes('/field-survey/notifications')) return 'notifications';
+        if (path.includes('/field-survey/profile')) return 'profile';
+        if (path.includes('/field-survey/view')) return 'view';
         return 'home';
     };
 
@@ -60,7 +60,7 @@ const EngineerDashboard = ({
         }
 
         const channel = supabase
-            .channel(`engineer_sync_${user.id}`)
+            .channel(`survey_person_sync_${user.id}`)
             .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
                 fetchLeads(false);
             })
@@ -151,20 +151,20 @@ const EngineerDashboard = ({
                 }
             }
         } else {
-            if (notification.type === 'reminder') navigate('/engineer/pending');
-            else if (notification.type === 'completion') navigate('/engineer/completed');
-            else navigate('/engineer/my-leads');
+            if (notification.type === 'reminder') navigate('/field-survey/pending');
+            else if (notification.type === 'completion') navigate('/field-survey/completed');
+            else navigate('/field-survey/my-leads');
         }
     };
 
     const navigationItems = [
-        { id: 'home', label: 'Home', icon: Home, path: '/engineer', color: 'text-blue-600', bgColor: 'bg-blue-50' },
-        { id: 'my-leads', label: 'My Leads', icon: FileText, path: '/engineer/my-leads', color: 'text-amber-600', bgColor: 'bg-amber-50' },
-        { id: 'new-entry', label: 'New Entry', icon: Plus, path: '/engineer/new', color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
-        { id: 'pending', label: 'Pending Tasks', icon: Clock, path: '/engineer/pending', color: 'text-rose-600', bgColor: 'bg-rose-50' },
-        { id: 'completed', label: 'Completed', icon: CheckCircle2, path: '/engineer/completed', color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-        { id: 'notifications', label: 'Notifications', icon: Bell, path: '/engineer/notifications', color: 'text-violet-600', bgColor: 'bg-violet-50' },
-        { id: 'profile', label: 'My Profile', icon: User, path: '/engineer/profile', color: 'text-slate-600', bgColor: 'bg-slate-50' },
+        { id: 'home', label: 'Home', icon: Home, path: '/field-survey', color: 'text-blue-600', bgColor: 'bg-blue-50' },
+        { id: 'my-leads', label: 'My Leads', icon: FileText, path: '/field-survey/my-leads', color: 'text-amber-600', bgColor: 'bg-amber-50' },
+        { id: 'new-entry', label: 'New Entry', icon: Plus, path: '/field-survey/new', color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+        { id: 'pending', label: 'Under Construction', icon: Clock, path: '/field-survey/pending', color: 'text-rose-600', bgColor: 'bg-rose-50' },
+        { id: 'completed', label: 'Closed Won', icon: CheckCircle2, path: '/field-survey/completed', color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
+        { id: 'notifications', label: 'Notifications', icon: Bell, path: '/field-survey/notifications', color: 'text-violet-600', bgColor: 'bg-violet-50' },
+        { id: 'profile', label: 'My Profile', icon: User, path: '/field-survey/profile', color: 'text-slate-600', bgColor: 'bg-slate-50' },
     ];
 
     const filteredLeads = leads.filter(lead => {
@@ -189,16 +189,17 @@ const EngineerDashboard = ({
                     <div className="flex items-center justify-between">
                         {/* Logo Section */}
                         <button
-                            onClick={() => navigate('/engineer')}
+                            onClick={() => navigate('/field-survey')}
                             className="flex items-center gap-2 sm:gap-2.5 hover:opacity-80 transition-opacity active:scale-95"
                         >
-                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-md">
-                                <Building2 size={18} className="sm:hidden" />
-                                <Building2 size={20} className="hidden sm:block" />
+                            <div className="w-11 h-11 sm:w-14 sm:h-14 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 overflow-hidden">
+                                <img src="/assests/logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
                             </div>
                             <div className="text-left">
-                                <h1 className="text-base sm:text-lg font-semibold text-slate-900 leading-tight">LeadPro</h1>
-                                <p className="text-[9px] sm:text-[10px] text-slate-500 hidden sm:block leading-tight">Field Management</p>
+                                <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight tracking-tight">
+                                    <span className="text-slate-800">Survey</span><span className="text-blue-500">2</span><span className="text-blue-600">Lead</span>
+                                </h1>
+                                <p className="text-[9px] sm:text-[10px] text-slate-500 hidden sm:block leading-tight tracking-wider uppercase">Field Management</p>
                             </div>
                         </button>
 
@@ -207,7 +208,7 @@ const EngineerDashboard = ({
                             <NotificationCenter
                                 user={user}
                                 onNotificationClick={handleNotificationClick}
-                                onSeeAll={() => navigate('/engineer/notifications')}
+                                onSeeAll={() => navigate('/field-survey/notifications')}
                             />
 
                             <button
@@ -219,7 +220,7 @@ const EngineerDashboard = ({
                                 </div>
                                 <div className="hidden md:block text-left">
                                     <p className="text-sm font-medium text-slate-900 leading-tight">{user.fullName}</p>
-                                    <p className="text-[10px] text-slate-500 leading-tight">Field Engineer</p>
+                                    <p className="text-[10px] text-slate-500 leading-tight">Field Survey Person</p>
                                 </div>
                                 <ChevronRight
                                     size={14}
@@ -267,7 +268,7 @@ const EngineerDashboard = ({
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium text-white text-sm sm:text-base truncate">{user.fullName}</p>
                                             <p className="text-[10px] sm:text-xs text-blue-100 truncate">{user.email}</p>
-                                            <p className="text-[10px] sm:text-xs text-blue-200 mt-0.5">Field Engineer</p>
+                                            <p className="text-[10px] sm:text-xs text-blue-200 mt-0.5">Field Survey Person</p>
                                         </div>
                                     </div>
                                 </div>
@@ -325,7 +326,7 @@ const EngineerDashboard = ({
                                         <LogOut size={16} className="sm:w-[18px] sm:h-[18px]" />
                                         <span>Logout</span>
                                     </button>
-                                    <p className="text-[9px] sm:text-[10px] text-center text-slate-400 mt-2 sm:mt-2.5">LeadPro v1.0.4</p>
+                                    <p className="text-[9px] sm:text-[10px] text-center text-slate-400 mt-2 sm:mt-2.5">Survey2Lead v1.0.4</p>
                                 </div>
                             </motion.div>
                         </>
@@ -349,13 +350,13 @@ const EngineerDashboard = ({
                         <HomeView
                             stats={stats}
                             leads={leads}
-                            setActiveView={(v) => navigate(`/engineer/${v === 'new-entry' ? 'new' : v}`)}
+                            setActiveView={(v) => navigate(`/field-survey/${v === 'new-entry' ? 'new' : v}`)}
                             onNewLead={onNewLead}
                             onView={onView}
                             fetchLeads={fetchLeads}
                         />
                     } />
-                    <Route path="home" element={<Navigate to="/engineer" replace />} />
+                    <Route path="home" element={<Navigate to="/field-survey" replace />} />
                     <Route path="my-leads" element={<MyLeadsView leads={filteredLeads} searchTerm={searchTerm} setSearchTerm={setSearchTerm} filterStatus={filterStatus} setFilterStatus={setFilterStatus} onView={onView} onEdit={onEditLead} />} />
                     <Route path="new" element={isSubmitted ? LeadSuccessView : LeadFormView} />
                     <Route path="pending" element={<PendingTasksView leads={leads.filter(l => (l.status === 'Roaming' || l.status === 'Temporarily Closed') && l.status !== 'Closed Permanently')} onView={onView} onEdit={onEditLead} />} />
@@ -369,9 +370,9 @@ const EngineerDashboard = ({
             <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-2xl z-40">
                 <div className="grid grid-cols-4 gap-1 p-2">
                     {[
-                        { id: 'home', icon: Home, label: 'Home', path: '/engineer', color: 'text-blue-500' },
-                        { id: 'my-leads', icon: FileText, label: 'Leads', path: '/engineer/my-leads', color: 'text-amber-500' },
-                        { id: 'new-entry', icon: Plus, label: 'New', path: '/engineer/new', color: 'text-emerald-500' },
+                        { id: 'home', icon: Home, label: 'Home', path: '/field-survey', color: 'text-blue-500' },
+                        { id: 'my-leads', icon: FileText, label: 'Leads', path: '/field-survey/my-leads', color: 'text-amber-500' },
+                        { id: 'new-entry', icon: Plus, label: 'New', path: '/field-survey/new', color: 'text-emerald-500' },
                         { id: 'menu', icon: Menu, label: 'Menu', onClick: () => setShowProfileMenu(true), color: 'text-slate-600' }
                     ].map((item) => (
                         <button
@@ -409,28 +410,28 @@ const HomeView = ({ stats, leads, setActiveView, onNewLead, onView, fetchLeads }
                     label="My Leads"
                     value={stats.total}
                     color="from-blue-600 to-indigo-700"
-                    onClick={() => navigate('/engineer/my-leads')}
+                    onClick={() => navigate('/field-survey/my-leads')}
                 />
                 <StatCard
                     icon={Clock}
-                    label="Pending Tasks"
+                    label="Under Construction"
                     value={stats.pending}
                     color="from-orange-500 to-red-500"
-                    onClick={() => navigate('/engineer/pending')}
+                    onClick={() => navigate('/field-survey/pending')}
                 />
                 <StatCard
                     icon={CheckCircle2}
-                    label="Completed"
+                    label="Closed Won"
                     value={stats.completed}
                     color="from-emerald-500 to-teal-600"
-                    onClick={() => navigate('/engineer/completed')}
+                    onClick={() => navigate('/field-survey/completed')}
                 />
                 <StatCard
                     icon={Bell}
-                    label="Reminders"
+                    label="Follow-ups"
                     value={stats.reminders}
                     color="from-purple-500 to-indigo-600"
-                    onClick={() => navigate('/engineer/notifications')}
+                    onClick={() => navigate('/field-survey/notifications')}
                 />
             </div>
 
@@ -444,8 +445,8 @@ const HomeView = ({ stats, leads, setActiveView, onNewLead, onView, fetchLeads }
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     <QuickActionButton icon={Plus} label="Create New Lead" onClick={onNewLead} color="emerald" />
-                    <QuickActionButton icon={FileText} label="View All Leads" onClick={() => navigate('/engineer/my-leads')} color="blue" />
-                    <QuickActionButton icon={Clock} label="Pending Tasks" onClick={() => navigate('/engineer/pending')} color="amber" />
+                    <QuickActionButton icon={FileText} label="View All Leads" onClick={() => navigate('/field-survey/my-leads')} color="blue" />
+                    <QuickActionButton icon={Clock} label="Pending Tasks" onClick={() => navigate('/field-survey/pending')} color="amber" />
                 </div>
             </div>
 
@@ -459,7 +460,7 @@ const HomeView = ({ stats, leads, setActiveView, onNewLead, onView, fetchLeads }
                         Recent Leads
                     </h2>
                     <button
-                        onClick={() => navigate('/engineer/my-leads')}
+                        onClick={() => navigate('/field-survey/my-leads')}
                         className="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 active:scale-95 transition-all"
                     >
                         View All <ChevronRight size={14} className="sm:size-4" />
@@ -531,17 +532,17 @@ const HomeView = ({ stats, leads, setActiveView, onNewLead, onView, fetchLeads }
 const StatCard = ({ icon: Icon, label, value, color, onClick }) => (
     <button
         onClick={onClick}
-        className={`bg-gradient-to-br ${color} rounded-2xl p-4 sm:p-5 text-white shadow-md hover:shadow-lg transition-all text-left w-full group overflow-hidden relative active:scale-[0.97]`}
+        className={`bg-gradient-to-br ${color} rounded-2xl p-3 sm:p-5 text-white shadow-md hover:shadow-lg transition-all text-left w-full group overflow-hidden relative active:scale-[0.97]`}
     >
         <div className="absolute -top-2 -right-2 p-2 opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all">
-            <Icon size={70} />
+            <Icon size={60} className="sm:w-[70px] sm:h-[70px]" />
         </div>
         <div className="relative z-10">
-            <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-3">
-                <Icon size={18} className="text-white" />
+            <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2 sm:mb-3">
+                <Icon size={16} className="text-white sm:w-[18px] sm:h-[18px]" />
             </div>
-            <p className="text-2xl sm:text-3xl font-bold mb-0.5 tracking-tight">{value}</p>
-            <p className="text-[10px] sm:text-xs font-medium opacity-90 uppercase tracking-wider">{label}</p>
+            <p className="text-xl sm:text-3xl font-bold mb-0.5 tracking-tight">{value}</p>
+            <p className="text-[9px] sm:text-xs font-medium opacity-90 uppercase tracking-wider">{label}</p>
         </div>
     </button>
 );
@@ -558,7 +559,7 @@ const QuickActionButton = ({ icon: Icon, label, onClick, color }) => {
     return (
         <button
             onClick={onClick}
-            className={`flex items-center gap-3 p-3.5 sm:p-4 ${styles.split(' ').slice(0, 2).join(' ')} border rounded-xl hover:bg-white hover:shadow-md transition-all group active:scale-[0.98] text-left`}
+            className={`flex items-center gap-3 p-3 sm:p-4 ${styles.split(' ').slice(0, 2).join(' ')} border rounded-xl hover:bg-white hover:shadow-md transition-all group active:scale-[0.98] text-left`}
         >
             <div className={`w-10 h-10 bg-gradient-to-br ${styles.split(' ').slice(3).join(' ')} rounded-lg flex items-center justify-center text-white shadow-sm shrink-0`}>
                 <Icon size={20} />
@@ -607,8 +608,8 @@ const MyLeadsView = ({ leads, searchTerm, setSearchTerm, filterStatus, setFilter
                             className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-lg font-medium text-[13px] sm:text-sm text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all cursor-pointer"
                         >
                             <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
+                            <option value="pending">Under Construction</option>
+                            <option value="completed">Closed Won</option>
                         </select>
                     </div>
                 </div>
@@ -618,7 +619,7 @@ const MyLeadsView = ({ leads, searchTerm, setSearchTerm, filterStatus, setFilter
             {leads.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                     {leads.map(lead => (
-                        <div key={lead.id} className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
+                        <div key={lead.id} className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
                             <div className="flex items-start justify-between mb-3 gap-2">
                                 <div className="flex-1 min-w-0">
                                     <span className="inline-block px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-[10px] sm:text-xs font-semibold mb-2">
@@ -701,7 +702,7 @@ const NewEntryView = ({ onComplete, user }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
         clientName: '', village: '', contactPhone: '', contactEmail: '',
-        engineerName: user.fullName || '',
+        surveyPersonName: user.fullName || '',
         visitDate: new Date().toISOString().split('T')[0],
         visitTime: new Date().toTimeString().slice(0, 5),
         siteSize: '', sitesVisited: 1,
@@ -923,22 +924,22 @@ const LeadListView = ({ title, icon: Icon, leads, onView, onEdit, emptyMessage }
 
 const PendingTasksView = ({ leads, onView, onEdit }) => (
     <LeadListView
-        title="Pending Tasks"
+        title="Under Construction"
         icon={Clock}
         leads={leads}
         onView={onView}
         onEdit={onEdit}
-        emptyMessage="No pending tasks found"
+        emptyMessage="No under construction projects found"
     />
 );
 
 const CompletedTasksView = ({ leads, onView }) => (
     <LeadListView
-        title="Completed Tasks"
+        title="Closed Won"
         icon={CheckCircle2}
         leads={leads}
         onView={onView}
-        emptyMessage="No completed tasks found"
+        emptyMessage="No closed won projects found"
     />
 );
 
@@ -955,5 +956,5 @@ const PlaceholderView = ({ icon: Icon, title }) => (
     </div>
 );
 
-export default EngineerDashboard;
+export default FieldSurveyDashboard;
 

@@ -3,7 +3,7 @@ import { supabase } from '../supabase';
 import {
     Home, Users, ClipboardList, UserCheck, ShoppingCart, FileText,
     Bell, Archive, Building2, ChevronRight, Clock,
-    LogOut, X, Menu, ArrowLeft, AlertCircle
+    LogOut, X, Menu, ArrowLeft, AlertCircle, XCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationCenter from './NotificationCenter';
@@ -13,6 +13,7 @@ import HomeOverview from './Admin/HomeOverview';
 import LeadsManagement from './Admin/LeadsManagement';
 import ReportsExports from './Admin/ReportsExports';
 import MasterArchive from './Admin/MasterArchive';
+import ClosedLossArchive from './Admin/ClosedLossArchive';
 import UserManagement from './Admin/UserManagement';
 
 import { checkAndCreateFollowUpNotifications } from '../services/notificationService';
@@ -33,6 +34,7 @@ const AdminDashboard = ({
         if (path.includes('/admin/reminders')) return 'reminders';
         if (path.includes('/admin/reports')) return 'reports';
         if (path.includes('/admin/archive')) return 'archive';
+        if (path.includes('/admin/loss')) return 'loss';
         if (path.includes('/admin/notifications')) return 'notifications';
         if (path.includes('/admin/view')) return 'view';
         if (path.includes('/admin/new')) return 'new';
@@ -42,7 +44,7 @@ const AdminDashboard = ({
     const activeView = getActiveView();
 
     const [leads, setLeads] = useState([]);
-    const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, reminders: 0, engineersCount: 0 });
+    const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, reminders: 0, surveyPersonsCount: 0 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -107,18 +109,19 @@ const AdminDashboard = ({
                 const activeLeads = data.filter(l => l.status !== 'Closed Permanently');
                 setLeads(activeLeads);
 
-                // Fetch engineer count for consistency
-                const { count: engCount } = await supabase
+                // Fetch survey person count for consistency
+                const { count: surveyCount } = await supabase
                     .from('users')
                     .select('*', { count: 'exact', head: true })
-                    .eq('role', 'engineer');
+                    .eq('role', 'engineer'); // Database role still 'engineer' but UI says 'Field Survey Person'
 
                 const statsObj = {
-                    total: activeLeads.length,
-                    pending: activeLeads.filter(l => String(l.status || '').toLowerCase() === 'roaming').length,
-                    completed: activeLeads.filter(l => String(l.status || '').toLowerCase() === 'master').length,
-                    reminders: activeLeads.filter(l => String(l.status || '').toLowerCase() === 'temporarily closed').length,
-                    engineersCount: engCount || 0
+                    total: data.length,
+                    underConstruction: data.filter(l => String(l.status || '').toLowerCase() === 'roaming').length,
+                    closedWon: data.filter(l => String(l.status || '').toLowerCase() === 'master').length,
+                    pending: data.filter(l => String(l.status || '').toLowerCase() === 'temporarily closed').length,
+                    closedLoss: data.filter(l => String(l.status || '').toLowerCase() === 'closed permanently').length,
+                    surveyPersonsCount: surveyCount || 0
                 };
                 setStats(statsObj);
             }
@@ -158,9 +161,10 @@ const AdminDashboard = ({
         { id: 'home', label: 'Home Overview', icon: Home, path: '/admin', color: 'text-blue-600', bgColor: 'bg-blue-50' },
         { id: 'leads', label: 'Leads Management', icon: ClipboardList, path: '/admin/leads', color: 'text-emerald-600', bgColor: 'bg-emerald-50' },
         { id: 'users', label: 'User Control', icon: Users, path: '/admin/users', color: 'text-indigo-600', bgColor: 'bg-indigo-50' },
-        { id: 'reminders', label: 'Pending Reminders', icon: Clock, path: '/admin/reminders', color: 'text-amber-600', bgColor: 'bg-amber-50' },
+        { id: 'reminders', label: 'Follow-ups', icon: Clock, path: '/admin/reminders', color: 'text-amber-600', bgColor: 'bg-amber-50' },
         { id: 'reports', label: 'Reports & Exports', icon: FileText, path: '/admin/reports', color: 'text-rose-600', bgColor: 'bg-rose-50' },
-        { id: 'archive', label: 'Master Archive', icon: Archive, path: '/admin/archive', color: 'text-slate-600', bgColor: 'bg-slate-50' },
+        { id: 'archive', label: 'Closed Won', icon: Archive, path: '/admin/archive', color: 'text-slate-600', bgColor: 'bg-slate-50' },
+        { id: 'loss', label: 'Closed Loss', icon: XCircle, path: '/admin/loss', color: 'text-red-600', bgColor: 'bg-red-50' },
         { id: 'notifications', label: 'Notifications', icon: Bell, path: '/admin/notifications', color: 'text-violet-600', bgColor: 'bg-violet-50' },
     ];
 
@@ -176,13 +180,14 @@ const AdminDashboard = ({
                                 onClick={() => navigate('/admin')}
                                 className="flex items-center gap-2 sm:gap-2.5 hover:opacity-80 transition-opacity active:scale-95"
                             >
-                                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-md">
-                                    <Building2 size={18} className="sm:hidden" />
-                                    <Building2 size={20} className="hidden sm:block" />
+                                <div className="w-11 h-11 sm:w-14 sm:h-14 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 overflow-hidden">
+                                    <img src="/assests/logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
                                 </div>
                                 <div className="text-left">
-                                    <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">LeadPro</h1>
-                                    <p className="text-[9px] sm:text-[10px] text-slate-500 font-semibold hidden sm:block leading-tight">Admin Portal</p>
+                                    <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight tracking-tight">
+                                        <span className="text-slate-800">Survey</span><span className="text-emerald-500">2</span><span className="text-emerald-600">Lead</span>
+                                    </h1>
+                                    <p className="text-[9px] sm:text-[10px] text-slate-500 font-semibold hidden sm:block leading-tight tracking-wider uppercase">Admin Portal</p>
                                 </div>
                             </button>
 
@@ -268,7 +273,7 @@ const AdminDashboard = ({
                                                         setShowProfileMenu(false);
                                                     }}
                                                     className={`
-                                                    w-full flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl 
+                                                    w-full flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl 
                                                     font-semibold text-xs sm:text-sm transition-all group
                                                     ${activeView === item.id
                                                             ? 'bg-slate-100 text-slate-900 shadow-sm'
@@ -285,14 +290,14 @@ const AdminDashboard = ({
                                                     <span className={`flex-1 text-left ${activeView === item.id ? 'translate-x-0.5 transition-transform' : ''}`}>
                                                         {item.label}
                                                     </span>
-                                                    {item.id === 'reminders' && stats.reminders > 0 && (
+                                                    {item.id === 'reminders' && stats.pending > 0 && (
                                                         <span className="px-2 py-0.5 bg-amber-500 text-white rounded-lg text-[10px] font-bold shadow-sm">
-                                                            {stats.reminders}
+                                                            {stats.pending}
                                                         </span>
                                                     )}
-                                                    {item.id === 'leads' && stats.pending > 0 && (
+                                                    {item.id === 'leads' && stats.underConstruction > 0 && (
                                                         <span className="px-2 py-0.5 bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow-sm">
-                                                            {stats.pending}
+                                                            {stats.underConstruction}
                                                         </span>
                                                     )}
                                                     {activeView === item.id ? (
@@ -313,8 +318,8 @@ const AdminDashboard = ({
                                                     <p className="text-[10px] sm:text-xs font-semibold text-slate-600">Total</p>
                                                 </div>
                                                 <div className="bg-white/60 backdrop-blur-sm rounded-lg sm:rounded-xl p-2.5 sm:p-3 border border-white">
-                                                    <p className="text-xl sm:text-2xl font-bold text-amber-600">{stats.pending}</p>
-                                                    <p className="text-[10px] sm:text-xs font-semibold text-slate-600">Pending</p>
+                                                    <p className="text-xl sm:text-2xl font-bold text-amber-600">{stats.underConstruction}</p>
+                                                    <p className="text-[10px] sm:text-xs font-semibold text-slate-600">Active</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -367,7 +372,8 @@ const AdminDashboard = ({
                             <Route path="users" element={<UserManagement />} />
                             <Route path="reminders" element={<LeadsManagement leads={leads.filter(l => String(l.status || '').toLowerCase() === 'temporarily closed')} fetchLeads={fetchLeads} onView={onView} onNewLead={onNewLead} title="Pending Reminders" />} />
                             <Route path="reports" element={<ReportsExports leads={leads} onView={onView} />} />
-                            <Route path="archive" element={<MasterArchive leads={leads.filter(l => l.status === 'Master')} onView={onView} />} />
+                            <Route path="archive" element={<MasterArchive leads={leads} onView={onView} />} />
+                            <Route path="loss" element={<ClosedLossArchive leads={leads} onView={onView} />} />
                             <Route path="notifications" element={<NotificationCenter user={user} fullPage onNotificationClick={handleNotificationClick} />} />
                             <Route path="new" element={isSubmitted ? LeadSuccessView : LeadFormView} />
                             <Route path="view" element={LeadDetailView} />
@@ -382,7 +388,7 @@ const AdminDashboard = ({
                 <div className="grid grid-cols-4 gap-0.5 p-1.5">
                     {[
                         { id: 'home', icon: Home, label: 'Home', path: '/admin', color: 'text-indigo-600' },
-                        { id: 'leads', icon: ClipboardList, label: 'Leads', path: '/admin/leads', color: 'text-emerald-600', badge: stats.pending },
+                        { id: 'leads', icon: ClipboardList, label: 'Leads', path: '/admin/leads', color: 'text-emerald-600', badge: stats.underConstruction },
                         { id: 'reports', icon: FileText, label: 'Reports', path: '/admin/reports', color: 'text-rose-600' },
                         { id: 'menu', icon: Menu, label: 'Menu', onClick: () => setShowProfileMenu(true), color: 'text-slate-600' }
                     ].map((item) => (
@@ -400,7 +406,7 @@ const AdminDashboard = ({
                                 </span>
                             )}
                             <item.icon
-                                size={22}
+                                size={20}
                                 className={`transition-colors ${activeView === item.id || item.id === 'menu' ? item.color : 'text-slate-400'}`}
                                 strokeWidth={activeView === item.id ? 2.5 : 2}
                             />

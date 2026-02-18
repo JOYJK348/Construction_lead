@@ -30,7 +30,7 @@ export const getPDFBlobURL = (leads, filename = 'leads_export') => {
 
         const options = {
             startY: 32,
-            head: [['Lead #', 'Status', 'Customer', 'Village', 'Doors', 'Engineer', 'Date', 'Reason']],
+            head: [['Lead #', 'Status', 'Customer', 'Village', 'Doors', 'Field Survey Person', 'Date', 'Reason']],
             body: tableData,
             theme: 'grid',
             headStyles: { fillColor: [99, 102, 241], textColor: 255 },
@@ -41,6 +41,22 @@ export const getPDFBlobURL = (leads, filename = 'leads_export') => {
             doc.autoTable(options);
         } else {
             autoTable(doc, options);
+        }
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setTextColor(30, 41, 59); // slate-800 (Much darker and bold)
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+            doc.setFont('helvetica', 'bold');
+            doc.text('Powered by Durkkas', pageWidth - 14, pageHeight - 10, { align: 'right' });
         }
 
         return doc.output('bloburl');
@@ -69,7 +85,7 @@ export const exportToExcel = (leads, filename = 'leads_export') => {
             'Building Type': lead.project_information?.[0]?.building_type || 'N/A',
             'Construction Stage': lead.project_information?.[0]?.construction_stage || 'N/A',
             'Total Doors': lead.project_information?.[0]?.estimated_total_door_count || 0,
-            'Engineer': lead.assignments?.[0]?.engineer?.full_name || 'Unassigned',
+            'Field Survey Person': lead.assignments?.[0]?.engineer?.full_name || 'Unassigned',
             'Created Date': new Date(lead.created_at).toLocaleDateString(),
             'Latitude': lead.site_visits?.[0]?.latitude || 'N/A',
             'Longitude': lead.site_visits?.[0]?.longitude || 'N/A',
@@ -147,7 +163,7 @@ export const exportToPDF = (leads, filename = 'leads_export') => {
         // in others it's imported separately. To be safe, we check both.
         const options = {
             startY: 32,
-            head: [['Lead #', 'Status', 'Customer', 'Village', 'Doors', 'Engineer', 'Date', 'Reason']],
+            head: [['Lead #', 'Status', 'Customer', 'Village', 'Doors', 'Field Survey Person', 'Date', 'Reason']],
             body: tableData,
             theme: 'grid',
             headStyles: {
@@ -178,14 +194,16 @@ export const exportToPDF = (leads, filename = 'leads_export') => {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setFont('helvetica', 'italic');
-            doc.text(
-                `Page ${i} of ${pageCount}`,
-                doc.internal.pageSize.getWidth() / 2,
-                doc.internal.pageSize.getHeight() - 10,
-                { align: 'center' }
-            );
+            doc.setFontSize(10);
+            doc.setTextColor(30, 41, 59); // slate-800
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+            doc.setFont('helvetica', 'bold');
+            doc.text('Powered by Durkkas', pageWidth - 14, pageHeight - 10, { align: 'right' });
         }
 
         // Save file
@@ -289,6 +307,22 @@ export const exportLeadDetailPDF = (lead) => {
                 theme: 'striped',
                 headStyles: { fillColor: [99, 102, 241] }
             });
+        }
+
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.setTextColor(30, 41, 59); // slate-800
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+            doc.setFont('helvetica', 'bold');
+            doc.text('Powered by Durkkas', pageWidth - 14, pageHeight - 10, { align: 'right' });
         }
 
         // Save
