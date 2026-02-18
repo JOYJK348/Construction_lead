@@ -180,8 +180,8 @@ const AdminDashboard = ({
                                 onClick={() => navigate('/admin')}
                                 className="flex items-center gap-2 sm:gap-2.5 hover:opacity-80 transition-opacity active:scale-95"
                             >
-                                <div className="w-11 h-11 sm:w-14 sm:h-14 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 overflow-hidden">
-                                    <img src="/assests/logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
+                                <div className="w-11 h-11 sm:w-14 sm:h-14 flex items-center justify-center transition-transform hover:scale-110">
+                                    <img src="/assests/logo.png" alt="Logo" className="w-full h-full object-contain filter drop-shadow-sm" />
                                 </div>
                                 <div className="text-left">
                                     <h1 className="text-base sm:text-lg font-black text-slate-900 leading-tight tracking-tight">

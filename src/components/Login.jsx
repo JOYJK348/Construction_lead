@@ -81,11 +81,15 @@ const Login = ({ onLogin }) => {
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="relative inline-block mb-6"
                         >
-                            {/* Glow ring behind logo */}
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-red-200/60 via-pink-100/40 to-transparent blur-2xl scale-150 -z-10" />
-                            {/* Logo container */}
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-red-100/60 overflow-hidden border border-slate-100/80 hover:scale-105 transition-transform duration-300">
-                                <img src="/assests/logo.png" alt="Durkkas Logo" className="w-[85%] h-[85%] object-contain" />
+                            {/* Glow ring behind logo for depth */}
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-red-400/10 via-pink-300/5 to-transparent blur-3xl scale-[2.5] -z-10" />
+                            {/* Logo container - Transparent for a modern floating look */}
+                            <div className="w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center mx-auto transition-transform duration-500 hover:scale-110 ease-out">
+                                <img
+                                    src="/assests/logo.png"
+                                    alt="Durkkas Logo"
+                                    className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(239,68,68,0.2)]"
+                                />
                             </div>
                         </motion.div>
 
