@@ -16,6 +16,18 @@ const NotificationCenter = ({ user, fullPage = false, onNotificationClick, onSee
     };
 
     useEffect(() => {
+        if (isOpen && !fullPage) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen, fullPage]);
+
+    useEffect(() => {
         if (user?.id) {
             fetchNotifications();
 

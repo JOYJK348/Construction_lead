@@ -43,6 +43,17 @@ const EngineerDashboard = ({
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     useEffect(() => {
+        if (showProfileMenu) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [showProfileMenu]);
+
+    useEffect(() => {
         fetchLeads();
         if (user?.id) {
             checkAndCreateFollowUpNotifications(user.id);

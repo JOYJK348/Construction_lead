@@ -18,6 +18,17 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
     const [rejectionReason, setRejectionReason] = useState('');
     const [sortBy, setSortBy] = useState('date_desc');
 
+    React.useEffect(() => {
+        if (showReasonModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [showReasonModal]);
+
     // Get unique villages and engineers for filters
     const villages = [...new Set(leads.map(l => l.site_visits?.[0]?.village_name).filter(Boolean))];
     const engineers = [...new Set(leads.map(l => l.assignments?.[0]?.engineer?.full_name).filter(Boolean))];
