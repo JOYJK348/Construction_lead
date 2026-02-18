@@ -237,9 +237,12 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
                 }]);
             }
 
-            // Notify admin
-            let title = isClientAvailable ? `🆕 New lead ${leadNumber}` : `⚠️ Missed Visit ${leadNumber}`;
-            if (existingLeadId) title = `🔄 Resubmitted: ${leadNumber}`;
+            // Enhance notification message with names
+            const customerName = formData.customer.isClientAvailable !== 'no' ? formData.customer.name : 'Unknown Client';
+            const projectName = formData.project.projectName || 'General Site';
+
+            let title = isClientAvailable ? `🆕 New Lead: ${customerName}` : `⚠️ Missed Visit: ${customerName}`;
+            if (existingLeadId) title = `🔄 Resubmitted: ${customerName}`;
 
             const { data: admins } = await supabase.from('users').select('id').eq('role', 'admin');
             if (admins) {
@@ -247,8 +250,8 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
                     user_id: admin.id,
                     lead_id: leadId,
                     message: existingLeadId
-                        ? `Lead ${leadNumber} has been corrected and resubmitted by ${userData.full_name}.`
-                        : `${title}: ${isClientAvailable ? 'Customer Available' : 'Client Not Available'} - Visit logged by ${userData.full_name}`,
+                        ? `Lead for ${customerName} (${projectName}) has been corrected and resubmitted by ${userData.full_name}.`
+                        : `${title} (${projectName}) - ${isClientAvailable ? 'Customer Available' : 'Client Not Available'} - Logged by ${userData.full_name}`,
                     type: existingLeadId ? 'assignment' : (isClientAvailable ? 'assignment' : 'reminder')
                 }));
                 await supabase.from('notifications').insert(adminNotifications);
@@ -283,11 +286,15 @@ export const approveLead = async (lead) => {
         const creatorId = lead.created_by;
         const notifications = [];
 
+        // Enhance notification message
+        const customerName = lead.customer_details?.[0]?.customer_name || 'Valued Client';
+        const projectName = lead.project_information?.[0]?.project_name || lead.lead_number;
+
         if (engId) {
             notifications.push({
                 user_id: engId,
                 lead_id: lead.id,
-                message: `✅ Lead ${lead.lead_number} was approved and moved to Master!`,
+                message: `✅ Lead for ${customerName} (${projectName}) was approved and moved to Master!`,
                 type: 'completion'
             });
         }
@@ -296,7 +303,7 @@ export const approveLead = async (lead) => {
             notifications.push({
                 user_id: creatorId,
                 lead_id: lead.id,
-                message: `✅ Your lead ${lead.lead_number} has been approved by Admin!`,
+                message: `✅ Your lead for ${customerName} has been approved by Admin!`,
                 type: 'completion'
             });
         }
@@ -332,11 +339,14 @@ export const rejectLead = async (lead, reason) => {
         const creatorId = lead.created_by;
         const notifications = [];
 
+        // Enhance notification message
+        const customerName = lead.customer_details?.[0]?.customer_name || 'Valued Client';
+
         if (engId) {
             notifications.push({
                 user_id: engId,
                 lead_id: lead.id,
-                message: `⚠️ Lead ${lead.lead_number} needs changes: ${reason}`,
+                message: `⚠️ Action Required: Lead for ${customerName} needs changes: ${reason}`,
                 type: 'reminder'
             });
         }
@@ -345,7 +355,7 @@ export const rejectLead = async (lead, reason) => {
             notifications.push({
                 user_id: creatorId,
                 lead_id: lead.id,
-                message: `⚠️ Your lead ${lead.lead_number} was marked for action: ${reason}`,
+                message: `⚠️ Update Needed: Your lead for ${customerName} was marked for action: ${reason}`,
                 type: 'reminder'
             });
         }
@@ -381,11 +391,14 @@ export const closePermanently = async (lead) => {
         const creatorId = lead.created_by;
         const notifications = [];
 
+        // Enhance notification message
+        const customerName = lead.customer_details?.[0]?.customer_name || 'Valued Client';
+
         if (engId) {
             notifications.push({
                 user_id: engId,
                 lead_id: lead.id,
-                message: `🚫 Lead ${lead.lead_number} has been closed permanently by Admin.`,
+                message: `🚫 Lead for ${customerName} has been closed permanently by Admin.`,
                 type: 'system'
             });
         }
@@ -394,7 +407,7 @@ export const closePermanently = async (lead) => {
             notifications.push({
                 user_id: creatorId,
                 lead_id: lead.id,
-                message: `🚫 Your lead ${lead.lead_number} has been closed permanently.`,
+                message: `🚫 Your lead for ${customerName} has been closed permanently.`,
                 type: 'system'
             });
         }

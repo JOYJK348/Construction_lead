@@ -14,12 +14,13 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
     const [filterEngineer, setFilterEngineer] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const [showReasonModal, setShowReasonModal] = useState(false);
+    const [showCloseModal, setShowCloseModal] = useState(false);
     const [selectedLead, setSelectedLead] = useState(null);
     const [rejectionReason, setRejectionReason] = useState('');
     const [sortBy, setSortBy] = useState('date_desc');
 
     React.useEffect(() => {
-        if (showReasonModal) {
+        if (showReasonModal || showCloseModal) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
@@ -27,7 +28,7 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
         return () => {
             document.body.style.overflow = '';
         };
-    }, [showReasonModal]);
+    }, [showReasonModal, showCloseModal]);
 
     // Get unique villages and engineers for filters
     const villages = [...new Set(leads.map(l => l.site_visits?.[0]?.village_name).filter(Boolean))];
@@ -97,14 +98,21 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
         }
     };
 
-    const handleClosePermanently = async (lead) => {
-        if (window.confirm(`Are you sure you want to CLOSE lead ${lead.lead_number} permanently? It will be hidden from everyone.`)) {
-            const result = await closePermanently(lead);
-            if (result.success) {
-                fetchLeads();
-            } else {
-                alert('Close failed: ' + result.error?.message);
-            }
+    const handleClosePermanently = (lead) => {
+        setSelectedLead(lead);
+        setShowCloseModal(true);
+    };
+
+    const confirmClosePermanently = async () => {
+        if (!selectedLead) return;
+
+        const result = await closePermanently(selectedLead);
+        if (result.success) {
+            setShowCloseModal(false);
+            setSelectedLead(null);
+            fetchLeads();
+        } else {
+            alert('Close failed: ' + result.error?.message);
         }
     };
 
@@ -305,6 +313,55 @@ const LeadsManagement = ({ leads, fetchLeads, onView, onNewLead, title = "Leads 
                                 >
                                     Confirm Reject
                                 </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Close Permanently Confirmation Modal */}
+            <AnimatePresence>
+                {showCloseModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+                        onClick={() => setShowCloseModal(false)}
+                    >
+                        <motion.div
+                            initial={{ y: '100%', opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: '100%', opacity: 0 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className="bg-white p-6 sm:p-8 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex flex-col items-center text-center">
+                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-900 mb-4">
+                                    <AlertCircle size={32} />
+                                </div>
+                                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Close Lead Permanently?</h3>
+                                <p className="text-slate-600 font-medium text-sm sm:text-base mb-6 px-2">
+                                    Are you sure you want to close lead <span className="font-bold text-slate-900">#{selectedLead?.lead_number}</span>? This action will hide it from everyone and cannot be undone easily.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-3 w-full">
+                                    <button
+                                        onClick={() => {
+                                            setShowCloseModal(false);
+                                            setSelectedLead(null);
+                                        }}
+                                        className="flex-1 py-3.5 px-4 font-bold text-sm sm:text-base text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-95"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={confirmClosePermanently}
+                                        className="flex-1 py-3.5 px-4 bg-slate-900 text-white rounded-xl font-bold text-sm sm:text-base hover:bg-black transition-all shadow-lg active:scale-95"
+                                    >
+                                        Yes, Close Permanently
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>

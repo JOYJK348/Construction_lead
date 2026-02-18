@@ -47,7 +47,8 @@ export const checkAndCreateFollowUpNotifications = async (userId) => {
             if (!leadInfo) continue;
 
             const customerName = leadInfo.customer_details?.[0]?.customer_name || 'Valued Client';
-            const reminderMessage = `⏰ REMINDER: Meeting tomorrow (${expected_completion_date}) with ${customerName} for Lead ${leadInfo.lead_number}. Please prepare for the visit.`;
+            const projectName = leadInfo.project_information?.[0]?.project_name || leadInfo.lead_number;
+            const reminderMessage = `⏰ Upcoming Meeting: ${customerName} (${projectName}) is scheduled for tomorrow (${expected_completion_date}). Please prepare for the visit.`;
 
             // Check if this specific reminder message already exists
             const { data: existingNotif } = await supabase

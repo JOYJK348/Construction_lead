@@ -258,12 +258,10 @@ const LocationPicker = ({ isOpen, onClose, onLocationSelect }) => {
 
             // Format address
             const addressParts = [
-                address.house_number,
-                address.road || address.street,
-                address.suburb || address.neighbourhood,
-                address.village || address.town || address.city,
-                address.state,
-                address.postcode
+                address.village || address.suburb || address.neighbourhood || address.hamlet,
+                address.town || address.city || address.municipality || address.city_district,
+                address.county || address.state_district,
+                address.state
             ].filter(Boolean);
 
             const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : data.display_name;

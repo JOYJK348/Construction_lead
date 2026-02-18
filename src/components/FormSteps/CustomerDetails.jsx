@@ -64,13 +64,10 @@ const CustomerDetails = ({ data, update, errors = {} }) => {
             const address = geocodeData.address || {};
 
             const addressParts = [
-                address.house_number,
-                address.road || address.street || address.path,
-                address.suburb || address.neighbourhood || address.hamlet,
-                address.village || address.town || address.city || address.municipality,
+                address.village || address.suburb || address.neighbourhood || address.hamlet,
+                address.town || address.city || address.municipality || address.city_district,
                 address.county || address.state_district,
-                address.state,
-                address.postcode
+                address.state
             ].filter(Boolean);
 
             let fullAddress = '';
@@ -238,8 +235,8 @@ const CustomerDetails = ({ data, update, errors = {} }) => {
                                         onClick={captureCurrentLocation}
                                         disabled={isFetchingLocation}
                                         className={`text-xs font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${isFetchingLocation
-                                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                : 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
+                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                            : 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
                                             }`}
                                     >
                                         {isFetchingLocation ? (
@@ -344,8 +341,8 @@ const CustomerDetails = ({ data, update, errors = {} }) => {
                                         onClick={captureCurrentLocation}
                                         disabled={isFetchingLocation}
                                         className={`text-xs font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${isFetchingLocation
-                                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                                                : 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
+                                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                            : 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
                                             }`}
                                     >
                                         {isFetchingLocation ? (

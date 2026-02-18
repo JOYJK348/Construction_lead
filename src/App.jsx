@@ -57,30 +57,38 @@ const ScrollToTop = () => {
 // --- Sub-Components for Routing (Defined Outside to Prevent Unmounting) ---
 
 const LeadSuccessView = ({ user, setIsSubmitted, setCurrentStep, setFormData, navigate, INITIAL_LEAD_DATA }) => (
-    <div className="min-h-screen bg-white sm:bg-slate-50 flex items-center justify-center p-0 sm:p-4">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white flex items-center justify-center p-4 sm:p-6">
         <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="p-8 sm:p-10 bg-white sm:rounded-3xl sm:shadow-2xl text-center max-w-md w-full border-t-[6px] border-emerald-500 min-h-screen sm:min-h-0 flex flex-col justify-center"
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="p-6 sm:p-8 md:p-10 bg-white rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl text-center max-w-md w-full border-t-4 sm:border-t-[6px] border-emerald-500"
         >
+            {/* Success Icon */}
             <div className="relative mb-6 sm:mb-8">
                 <div className="absolute inset-0 bg-emerald-100 rounded-full blur-2xl opacity-50 animate-pulse" />
-                <CheckCircle2 size={100} className="text-emerald-500 mx-auto relative z-10 sm:size-24" />
+                <CheckCircle2 size={80} className="text-emerald-500 mx-auto relative z-10 sm:w-24 sm:h-24" />
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Lead Collected!</h1>
-            <p className="text-sm sm:text-base text-slate-600 mb-10 sm:mb-12">The lead has been recorded successfully and is now ready for processing.</p>
+            {/* Success Message */}
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2 sm:mb-3 px-2">
+                Lead Collected Successfully!
+            </h1>
+            <p className="text-sm sm:text-base text-slate-600 mb-8 sm:mb-10 px-2 leading-relaxed">
+                The lead has been recorded and is now ready for processing.
+            </p>
 
-            <div className="space-y-3.5 mt-auto sm:mt-0">
+            {/* Action Buttons */}
+            <div className="space-y-3 sm:space-y-3.5">
                 <button
                     onClick={() => { setIsSubmitted(false); setCurrentStep(0); setFormData(INITIAL_LEAD_DATA); navigate(user.role === 'admin' ? '/admin/new' : '/engineer/new'); }}
-                    className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-semibold shadow-lg shadow-emerald-200 active:scale-[0.98] transition-all"
+                    className="w-full py-3.5 sm:py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base shadow-lg shadow-emerald-200 active:scale-[0.98] transition-all"
                 >
-                    Collect Another
+                    Collect Another Lead
                 </button>
                 <button
                     onClick={() => { setIsSubmitted(false); navigate(user.role === 'admin' ? '/admin' : '/engineer'); }}
-                    className="w-full py-4 bg-slate-50 text-slate-600 rounded-2xl font-semibold active:bg-slate-100 active:scale-[0.98] transition-all"
+                    className="w-full py-3.5 sm:py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base active:scale-[0.98] transition-all"
                 >
                     Back to Dashboard
                 </button>
@@ -147,8 +155,8 @@ const LeadDetailView = ({ viewModeLead, navigate, user, handleApproveAction, isA
                                         onClick={() => isClientAvailable && handleApproveAction(viewModeLead)}
                                         disabled={isActionLoading || !isClientAvailable}
                                         className={`flex-[2] py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${isClientAvailable
-                                                ? 'bg-emerald-600 text-white shadow-emerald-200'
-                                                : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
+                                            ? 'bg-emerald-600 text-white shadow-emerald-200'
+                                            : 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed'
                                             }`}
                                     >
                                         {isActionLoading ? <Loader2 size={20} className="animate-spin" /> : <CheckCircle2 size={20} />}
@@ -484,6 +492,7 @@ function App() {
 
     // Scroll to top whenever step changes
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (mainContentRef.current) {
             mainContentRef.current.scrollTop = 0;
         }

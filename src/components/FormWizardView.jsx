@@ -33,6 +33,7 @@ const FormWizardView = ({ user, onComplete, onCancel }) => {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         if (mainContentRef.current) {
             mainContentRef.current.scrollTop = 0;
         }
@@ -193,8 +194,8 @@ const FormWizardView = ({ user, onComplete, onCancel }) => {
                             onClick={nextStep}
                             disabled={isSubmitting}
                             className={`flex-1 py-3 px-4 md:px-6 rounded-xl font-bold flex items-center justify-center gap-1 md:gap-2 shadow-lg transition-all active:scale-95 group text-sm md:text-base ${currentStep === 0 && formData.customer.isClientAvailable === 'no'
-                                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
-                                    : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
+                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
+                                : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
                                 } disabled:opacity-50`}
                         >
                             {isSubmitting ? (

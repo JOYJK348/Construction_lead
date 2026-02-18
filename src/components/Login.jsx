@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn, User, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { LogIn, User, Lock, AlertCircle, Loader2, Eye, EyeOff, Building2, Sparkles } from 'lucide-react';
 import { supabase } from '../supabase';
 
 const Login = ({ onLogin }) => {
@@ -50,105 +50,187 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-100 flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-100/40 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-emerald-50 to-blue-50 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Grid Pattern Overlay */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.01)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none"></div>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-white p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-sm border border-white/50 relative overflow-hidden"
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="relative w-full max-w-md"
             >
-                {/* Decorative background blur */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none"></div>
+                {/* Main Card */}
+                <div className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white relative overflow-hidden">
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-emerald-400/20 to-transparent rounded-full blur-2xl -mr-20 -mt-20"></div>
+                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-blue-400/20 to-transparent rounded-full blur-2xl -ml-20 -mb-20"></div>
 
-                <div className="text-center mb-10 relative">
-                    <div className="w-20 h-20 bg-gradient-to-tr from-emerald-50 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-6 text-emerald-600 shadow-sm transform rotate-3">
-                        <LogIn size={36} strokeWidth={2.5} />
+                    {/* Header */}
+                    <div className="text-center mb-8 sm:mb-10 relative">
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            className="relative inline-block mb-6"
+                        >
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/30 transform rotate-3 hover:rotate-6 transition-transform">
+                                <Building2 size={36} className="text-white" strokeWidth={2.5} />
+                            </div>
+                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                                <Sparkles size={14} className="text-white" />
+                            </div>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-2 tracking-tight">
+                                LeadPro Portal
+                            </h1>
+                            <p className="text-slate-500 font-semibold text-sm sm:text-base">
+                                Construction Lead Management
+                            </p>
+                        </motion.div>
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 font-display mb-2 tracking-tight">LeadPro Portal</h1>
-                    <p className="text-slate-500 font-medium text-sm">Sign in with your credentials</p>
+
+                    {/* Login Form */}
+                    <form onSubmit={handleLogin} className="space-y-5 sm:space-y-6 relative" autoComplete="off">
+                        {/* Username/Email Field */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="space-y-2"
+                        >
+                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1.5">
+                                <User size={14} />
+                                Username or Email
+                            </label>
+                            <div className="relative group">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
+                                    <User size={20} />
+                                </div>
+                                <input
+                                    type="text"
+                                    name="identifier"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Enter your username or email"
+                                    className="w-full bg-slate-50/50 border-2 border-slate-200 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-12 pr-4 font-semibold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-400 placeholder:font-normal text-sm sm:text-base"
+                                    required
+                                    disabled={isLoading}
+                                    autoComplete="off"
+                                />
+                            </div>
+                        </motion.div>
+
+                        {/* Password Field */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="space-y-2"
+                        >
+                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider ml-1 flex items-center gap-1.5">
+                                <Lock size={14} />
+                                Password
+                            </label>
+                            <div className="relative group">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
+                                    <Lock size={20} />
+                                </div>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                    className="w-full bg-slate-50/50 border-2 border-slate-200 rounded-xl sm:rounded-2xl py-3 sm:py-4 pl-12 pr-12 font-semibold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-400 placeholder:font-normal text-sm sm:text-base"
+                                    required
+                                    disabled={isLoading}
+                                    autoComplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none p-1 rounded-lg hover:bg-slate-100 active:scale-95"
+                                    title={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
+                        </motion.div>
+
+                        {/* Error Message */}
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="flex items-start gap-3 text-rose-600 text-sm font-semibold bg-rose-50 p-4 rounded-xl sm:rounded-2xl border-2 border-rose-200"
+                            >
+                                <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                                <span>{error}</span>
+                            </motion.div>
+                        )}
+
+                        {/* Submit Button */}
+                        <motion.button
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6 }}
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white rounded-xl sm:rounded-2xl font-bold shadow-xl shadow-slate-900/30 active:scale-[0.98] transition-all text-sm sm:text-base flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 size={20} className="animate-spin" />
+                                    <span>Signing in...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Sign In</span>
+                                    <LogIn size={20} className="opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                                </>
+                            )}
+                        </motion.button>
+                    </form>
+
+                    {/* Footer Note */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.7 }}
+                        className="mt-6 sm:mt-8 text-center"
+                    >
+                        <p className="text-xs sm:text-sm text-slate-400 font-medium">
+                            Secure access for authorized personnel only
+                        </p>
+                    </motion.div>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-6 relative" autoComplete="off">
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 font-display uppercase tracking-wider ml-1">Username or Email</label>
-                        <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
-                                <User size={20} />
-                            </div>
-                            <input
-                                type="text"
-                                name="identifier"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Username or Email"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 font-bold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-300 placeholder:font-medium"
-                                required
-                                disabled={isLoading}
-                                autoComplete="off"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 font-display uppercase tracking-wider ml-1">Password</label>
-                        <div className="relative group">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
-                                <Lock size={20} />
-                            </div>
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-12 font-bold text-slate-900 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none placeholder:text-slate-300 placeholder:font-medium"
-                                required
-                                disabled={isLoading}
-                                autoComplete="new-password"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
-                                title={showPassword ? "Hide password" : "Show password"}
-                            >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
-                        </div>
-                    </div>
-
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            className="flex items-center gap-3 text-rose-500 text-sm font-bold bg-rose-50 p-4 rounded-2xl border border-rose-100"
-                        >
-                            <AlertCircle size={18} className="flex-shrink-0" />
-                            {error}
-                        </motion.div>
-                    )}
-
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-lg shadow-slate-200 hover:bg-slate-800 active:scale-95 transition-all text-base flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                        {isLoading ? (
-                            <>
-                                <Loader2 size={18} className="animate-spin" />
-                                <span>Signing in...</span>
-                            </>
-                        ) : (
-                            <>
-                                <span>Sign In</span>
-                                <LogIn size={18} className="opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                            </>
-                        )}
-                    </button>
-
-
-                </form>
+                {/* Bottom Branding */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="mt-6 text-center"
+                >
+                    <p className="text-xs sm:text-sm text-slate-400 font-semibold px-4">
+                        Powered by <span className="text-slate-900 font-bold">LeadPro</span> © 2026
+                    </p>
+                </motion.div>
             </motion.div>
         </div>
     );
