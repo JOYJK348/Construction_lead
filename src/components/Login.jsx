@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn, User, Lock, AlertCircle, Loader2, Eye, EyeOff, Building2, Sparkles } from 'lucide-react';
+import { LogIn, User, Lock, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../supabase';
 
 const Login = ({ onLogin }) => {
@@ -81,11 +81,11 @@ const Login = ({ onLogin }) => {
                             transition={{ delay: 0.2, duration: 0.5 }}
                             className="relative inline-block mb-6"
                         >
-                            <div className="w-20 h-20 sm:w-28 sm:h-28 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-slate-200 transform rotate-3 hover:rotate-6 transition-transform overflow-hidden border border-slate-100">
-                                <img src="/assests/logo.png" alt="Durkkas Logo" className="w-full h-full object-cover scale-110" />
-                            </div>
-                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
-                                <Sparkles size={14} className="text-white" />
+                            {/* Glow ring behind logo */}
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-red-200/60 via-pink-100/40 to-transparent blur-2xl scale-150 -z-10" />
+                            {/* Logo container */}
+                            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-red-100/60 overflow-hidden border border-slate-100/80 hover:scale-105 transition-transform duration-300">
+                                <img src="/assests/logo.png" alt="Durkkas Logo" className="w-[85%] h-[85%] object-contain" />
                             </div>
                         </motion.div>
 
