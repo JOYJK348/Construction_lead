@@ -186,7 +186,8 @@ const Summary = ({ data, isReview = true }) => {
                             </div>
                         </div>
                         <div className="grid grid-cols-1 gap-6 pt-4">
-                            <DataRow label="Site Address" value={customer.address} icon={MapPin} highlight />
+                            <DataRow label="Client / Site Name" value={customer.name} icon={User} highlight />
+                            <DataRow label="Site Address" value={customer.address} icon={MapPin} />
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
                                     <DataRow label="Target Return Date" value={followUpDate} icon={Calendar} highlight />

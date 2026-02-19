@@ -24,8 +24,9 @@ export const sanitizeNumber = (value) => {
 
 // 3. Name Fields: Allow Alphabets + Space, trim extra spaces logic (on blur usually, but here we sanitizing input chars)
 export const sanitizeName = (value) => {
-    // Allow only letters and spaces
-    return value.replace(/[^a-zA-Z\s]/g, '');
+    // Allow letters from any language, numbers, and spaces
+    // We block specific common punctuation/symbols that shouldn't be in a name
+    return value.replace(/[!@#$%^&*()_+={}\[\]:;"'<>,?~`|\\<>]/g, '');
 };
 
 // 4. Address / Remarks: Allow text + numbers + basic chars (, . -), Block emojis

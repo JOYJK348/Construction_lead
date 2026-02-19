@@ -504,6 +504,7 @@ function App() {
 
         if (isClientAvailable === 'no') {
             // minimal validation for unavailable client
+            if (!name) newErrors.name = 'Client Name / Site Name is required';
             if (!followUpDate) newErrors.followUpDate = 'Follow-up Date is required';
             if (!estimatedDoorCount) newErrors.estimatedDoorCount = 'Estimated Door Count is required';
         } else {

@@ -107,14 +107,20 @@ const ProjectDetails = ({ data, update, errors = {} }) => {
                     <label className="text-[13px] font-semibold text-slate-700 flex items-center gap-1 ml-1">
                         Requirement Timeline <span className="text-blue-500">*</span>
                     </label>
-                    <div className="relative group">
+                    <div
+                        className="relative group cursor-pointer"
+                        onClick={(e) => {
+                            const input = e.currentTarget.querySelector('input');
+                            if (input && input.showPicker) input.showPicker();
+                        }}
+                    >
                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                         <input
-                            type="text"
+                            type="date"
                             value={data.doorRequirementTimeline}
-                            onChange={(e) => handleChange('doorRequirementTimeline', sanitizeAddress(e.target.value))}
-                            placeholder="e.g. 3 months or MM/YYYY"
-                            className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl font-medium text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm"
+                            onChange={(e) => handleChange('doorRequirementTimeline', e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
+                            className="w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl font-medium text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm cursor-pointer"
                         />
                     </div>
                     <ErrorMessage error={errors.doorRequirementTimeline} />

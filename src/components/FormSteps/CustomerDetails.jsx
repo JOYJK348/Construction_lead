@@ -330,6 +330,25 @@ const CustomerDetails = ({ data, update, errors = {} }) => {
                         </div>
 
                         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+                            {/* Client Name / Site Name */}
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Client Name / Site Name <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <input
+                                        type="text"
+                                        value={data.name || ''}
+                                        onChange={(e) => handleChange('name', sanitizeName(e.target.value))}
+                                        placeholder="e.g. Dream Villa or Rajesh Site"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                                    />
+                                </div>
+                                <ErrorMessage error={errors.name} />
+                            </div>
+
                             {/* Site Location */}
                             <div>
                                 <div className="flex items-center justify-between mb-2">
@@ -385,15 +404,21 @@ const CustomerDetails = ({ data, update, errors = {} }) => {
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
                                     Follow-up Date <span className="text-red-500">*</span>
                                 </label>
-                                <div className="relative">
-                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <div
+                                    className="relative group cursor-pointer"
+                                    onClick={(e) => {
+                                        const input = e.currentTarget.querySelector('input');
+                                        if (input && input.showPicker) input.showPicker();
+                                    }}
+                                >
+                                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                                     <input
                                         type="date"
                                         value={data.followUpDate}
                                         onChange={(e) => handleChange('followUpDate', e.target.value)}
                                         min={new Date().toISOString().split('T')[0]}
                                         required
-                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all cursor-pointer"
                                     />
                                 </div>
                                 <ErrorMessage error={errors.followUpDate} />

@@ -49,9 +49,9 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
         }
 
         // 2. Insert Customer Details
-        // Handle unavailable client with placeholders to satisfy DB constraints
-        const customerName = isClientAvailable ? formData.customer.name : 'Client Unavailable';
-        const mobileNumber = isClientAvailable ? formData.customer.mobile : '0000000000';
+        // Handle unavailable client with captured name or fallback
+        const customerName = formData.customer.name?.trim() || (isClientAvailable ? 'Unknown' : 'Client Unavailable');
+        const mobileNumber = isClientAvailable ? (formData.customer.mobile || '0000000000') : '0000000000';
         let remarks = formData.customer.remarks || '';
 
         if (!isClientAvailable) {
@@ -82,7 +82,7 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
         // 3. Insert Project Information
         const projectPayload = {
             lead_id: leadId,
-            project_name: isClientAvailable ? formData.project.projectName : 'Unknown Project',
+            project_name: formData.project.projectName?.trim() || formData.customer.name?.trim() || (isClientAvailable ? 'Unknown Project' : 'General Site'),
             building_type: isClientAvailable ? formData.project.buildingType : 'Residential',
             construction_stage: isClientAvailable ? formData.project.constructionStage : 'Unknown',
             door_requirement_timeline: isClientAvailable ? formData.project.doorRequirementTimeline : 'Unknown',
@@ -239,11 +239,11 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
             }
 
             // Enhance notification message with names
-            const customerName = formData.customer.isClientAvailable !== 'no' ? formData.customer.name : 'Unknown Client';
-            const projectName = formData.project.projectName || 'General Site';
+            const effectiveCustomerName = formData.customer.name?.trim() || 'Unknown Client';
+            const effectiveProjectName = formData.project.projectName?.trim() || formData.customer.name?.trim() || 'General Site';
 
-            let title = isClientAvailable ? `🆕 New Lead: ${customerName}` : `⚠️ Missed Visit: ${customerName}`;
-            if (existingLeadId) title = `🔄 Resubmitted: ${customerName}`;
+            let title = isClientAvailable ? `🆕 New Lead: ${effectiveCustomerName}` : `⚠️ Missed Visit: ${effectiveCustomerName}`;
+            if (existingLeadId) title = `🔄 Resubmitted: ${effectiveCustomerName}`;
 
             const { data: admins } = await supabase.from('users').select('id').eq('role', 'admin');
             if (admins) {
@@ -251,8 +251,8 @@ export const submitLead = async (formData, userId, existingLeadId = null) => {
                     user_id: admin.id,
                     lead_id: leadId,
                     message: existingLeadId
-                        ? `Lead for ${customerName} (${projectName}) has been corrected and resubmitted by ${userData.full_name}.`
-                        : `${title} (${projectName}) - ${isClientAvailable ? 'Customer Available' : 'Client Not Available'} - Logged by ${userData.full_name}`,
+                        ? `Lead for ${effectiveCustomerName} (${effectiveProjectName}) has been corrected and resubmitted by ${userData.full_name}.`
+                        : `${title} (${effectiveProjectName}) - ${isClientAvailable ? 'Customer Available' : 'Client Not Available'} - Logged by ${userData.full_name}`,
                     type: existingLeadId ? 'assignment' : (isClientAvailable ? 'assignment' : 'reminder')
                 }));
                 await supabase.from('notifications').insert(adminNotifications);

@@ -46,12 +46,14 @@ body {
 }
 
 html {
-  font-size: 14px; /* Smaller base font for mobile */
+  font-size: 14px;
+  /* Smaller base font for mobile */
 }
 
 @media (min-width: 640px) {
   html {
-    font-size: 16px; /* Standard base font for tablet/desktop */
+    font-size: 16px;
+    /* Standard base font for tablet/desktop */
   }
 }
 
@@ -334,4 +336,37 @@ html {
 
 .animate-pulse-slow {
   animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Base Date Picker Enhancements */
+input[type="date"] {
+  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+/* Hide native calendar icon to avoid clashing with our custom icons */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  color: transparent;
+  background: transparent;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Responsive adjustment for date pickers on mobile */
+@media (max-width: 640px) {
+  input[type="date"] {
+    font-size: 16px !important;
+    /* Prevent iOS zoom */
+  }
 }
