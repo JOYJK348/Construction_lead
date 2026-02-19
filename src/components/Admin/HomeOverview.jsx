@@ -26,7 +26,7 @@ const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
     const surveyPersonStats = leads.reduce((acc, lead) => {
         const surveyPersonName = lead.assignments?.[0]?.engineer?.full_name || 'Unassigned';
         if (!acc[surveyPersonName]) {
-            acc[surveyPersonName] = { total: 0, completed: 0, pending: 0 };
+            acc[surveyPersonName] = { total: 0, completed: 0, pending: 0, lost: 0 };
         }
         acc[surveyPersonName].total++;
 
@@ -69,7 +69,9 @@ const HomeOverview = ({ stats, leads, onView, onNewLead }) => {
                         <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/20 transition-transform active:scale-95 sm:hover:scale-105">
                             <p className="text-white/80 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">Rate</p>
                             <p className="text-2xl sm:text-3xl font-bold text-white mt-1">
-                                {stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}%
+                                {Number(stats?.total) > 0
+                                    ? Math.round(((Number(stats?.closedWon) || 0) / Number(stats?.total)) * 100)
+                                    : 0}%
                             </p>
                         </div>
                         <div className="bg-white/10 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/20 transition-transform active:scale-95 sm:hover:scale-105">

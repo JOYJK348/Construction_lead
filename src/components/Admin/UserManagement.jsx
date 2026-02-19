@@ -116,33 +116,75 @@ const UserManagement = () => {
                     <p className="text-slate-600 font-medium text-sm sm:text-base mt-0.5">Manage admin and field survey person accounts</p>
                 </div>
                 <button
-                    onClick={() => handleOpenModal()}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all active:scale-95"
+                    disabled
+                    className="flex items-center justify-center gap-2 bg-slate-400 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-sm sm:text-base cursor-not-allowed shadow-inner opacity-75"
                 >
                     <UserPlus size={18} className="sm:w-5 sm:h-5" />
-                    <span className="hidden sm:inline">Add New User</span>
-                    <span className="sm:hidden">New User</span>
+                    <span className="hidden sm:inline">Add New User (Under Construction)</span>
+                    <span className="sm:hidden text-xs">Under Construction</span>
                 </button>
             </div>
 
-            {/* Stats Summary - Mobile Optimized */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm">
-                    <p className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Total</p>
-                    <p className="text-xl sm:text-2xl font-bold text-slate-900">{users.length}</p>
-                </div>
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm">
-                    <p className="text-[10px] sm:text-xs font-semibold text-emerald-600 uppercase tracking-wide mb-1">Active</p>
-                    <p className="text-xl sm:text-2xl font-bold text-slate-900">{users.filter(u => u.is_active).length}</p>
-                </div>
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm">
-                    <p className="text-[10px] sm:text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">Admins</p>
-                    <p className="text-xl sm:text-2xl font-bold text-slate-900">{users.filter(u => u.role === 'admin').length}</p>
-                </div>
-                <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm">
-                    <p className="text-[10px] sm:text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Field Surveyors</p>
-                    <p className="text-xl sm:text-2xl font-bold text-slate-900">{users.filter(u => u.role === 'engineer').length}</p>
-                </div>
+            {/* Stats Summary - Desktop Optimized Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-100 transition-colors"
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+                            <Users size={16} />
+                        </div>
+                        <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">Total Users</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{users.length}</p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-100 transition-colors"
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                            <Check size={16} />
+                        </div>
+                        <p className="text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-widest">Active Accounts</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{users.filter(u => u.is_active).length}</p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-100 transition-colors"
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                            <Shield size={16} />
+                        </div>
+                        <p className="text-[10px] sm:text-xs font-bold text-indigo-600 uppercase tracking-widest">Admin Staff</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{users.filter(u => u.role === 'admin').length}</p>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-100 transition-colors"
+                >
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                            <User size={16} />
+                        </div>
+                        <p className="text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-widest">Field Personnel</p>
+                    </div>
+                    <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{users.filter(u => u.role === 'engineer').length}</p>
+                </motion.div>
             </div>
 
             {/* Search Card - Mobile Optimized */}
@@ -486,48 +528,69 @@ const UserManagement = () => {
 };
 
 // Mobile User Card Component
-const UserCard = ({ user, onEdit, onDelete }) => (
-    <div className="p-4 hover:bg-slate-50 transition-colors">
-        <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
-                        {user.user_number || 'N/A'}
-                    </span>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${user.role === 'admin'
-                        ? 'bg-purple-50 text-purple-700 border border-purple-100'
-                        : 'bg-blue-50 text-blue-700 border border-blue-100'
-                        }`}>
-                        <Shield size={8} />
-                        {user.role}
-                    </span>
-                </div>
-                <p className="font-semibold text-slate-900 text-sm truncate">{user.full_name}</p>
-                <p className="text-xs text-slate-500 font-medium truncate">@{user.username}</p>
-                <p className="text-xs text-slate-400 truncate mt-0.5">{user.email}</p>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${user.is_active ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' : 'text-slate-400 bg-slate-100 border border-slate-200'
+const UserCard = ({ user, onEdit, onDelete }) => {
+    const getInitials = (name) => {
+        return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : '??';
+    };
+
+    return (
+        <div className="p-4 relative hover:bg-slate-50 transition-all border-b border-slate-50 last:border-0">
+            <div className="flex items-start gap-4">
+                {/* User Avatar Initial */}
+                <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-sm ${user.role === 'admin'
+                    ? 'bg-purple-100 text-purple-700'
+                    : 'bg-indigo-100 text-indigo-700'
                     }`}>
-                    {user.is_active ? 'Active' : 'Inactive'}
-                </span>
-                <div className="flex items-center gap-1">
+                    {getInitials(user.full_name)}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                        <p className="font-bold text-slate-900 text-sm truncate">{user.full_name}</p>
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${user.is_active ? 'text-emerald-700 bg-emerald-50' : 'text-slate-400 bg-slate-100'
+                            }`}>
+                            {user.is_active ? 'Active' : 'Offline'}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-1.5">
+                        <span className="font-mono text-[9px] font-bold text-indigo-600 bg-indigo-50/50 px-1.5 py-0.5 rounded-md">
+                            {user.user_number || 'USR-***'}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-bold">•</span>
+                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">
+                            {user.role}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                            <Mail size={10} className="text-slate-300" />
+                            <span className="truncate">{user.email}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Actions - Vertical on Mobile for better spacing */}
+                <div className="flex flex-col gap-1.5 pl-2">
                     <button
                         onClick={onEdit}
-                        className="p-1.5 hover:bg-slate-200 text-slate-600 rounded-lg transition-all"
+                        className="p-2.5 bg-slate-50 text-slate-600 rounded-xl active:bg-slate-100 transition-colors shadow-sm"
+                        title="Edit"
                     >
                         <Edit2 size={14} />
                     </button>
                     <button
                         onClick={onDelete}
-                        className="p-1.5 hover:bg-rose-50 text-rose-500 rounded-lg transition-all"
+                        className="p-2.5 bg-rose-50 text-rose-500 rounded-xl active:bg-rose-100 transition-colors shadow-sm"
+                        title="Delete"
                     >
                         <Trash2 size={14} />
                     </button>
                 </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default UserManagement;

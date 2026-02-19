@@ -44,7 +44,15 @@ const AdminDashboard = ({
     const activeView = getActiveView();
 
     const [leads, setLeads] = useState([]);
-    const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, reminders: 0, surveyPersonsCount: 0 });
+    const [stats, setStats] = useState({
+        total: 0,
+        underConstruction: 0,
+        closedWon: 0,
+        pending: 0,
+        closedLoss: 0,
+        reminders: 0,
+        surveyPersonsCount: 0
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
